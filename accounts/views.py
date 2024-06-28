@@ -29,3 +29,7 @@ def logout_view(request):
     if request.method == 'POST':
         logout(request)
         return redirect('some-redirect-url')  # 로그아웃 후 리다이렉트할 URL
+    
+
+def userSetting_View(request):
+    return render(request, 'accounts/userSetting.html')

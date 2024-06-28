@@ -1,7 +1,7 @@
 body {
     font-family: Arial, sans-serif;
     margin: 0;
-    padding: 20px; /* 페이지 전체와의 간격 추가 */
+    padding: 20px;
     background-color: #f4f5f7;
     display: flex;
     flex-direction: column;
@@ -11,7 +11,7 @@ body {
 .container {
     display: flex;
     flex-direction: column;
-    gap: 20px; /* 헤더와 사이드바 사이의 간격 */
+    gap: 20px;
     height: 100%;
 }
 
@@ -33,7 +33,7 @@ body {
 .header-right {
     display: flex;
     align-items: center;
-    gap: 20px; /* 요소 사이에 간격 추가 */
+    gap: 20px;
 }
 
 .header-right .profile-info {
@@ -56,7 +56,7 @@ body {
 .main-content-wrapper {
     display: flex;
     flex: 1;
-    gap: 20px; /* 사이드바와 메인 콘텐츠 사이의 간격 */
+    gap: 20px;
 }
 
 .sidebar {
@@ -67,31 +67,96 @@ body {
     border-radius: 8px;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
 }
 
 .logo {
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 20px;
+    text-align: center; /* 가운데 정렬 */
 }
 
-.sidebar ul {
+.menu {
     list-style: none;
     padding: 0;
-    flex: 1;
+    margin-bottom: auto; /* 상단 메뉴와 환경설정 메뉴 사이의 공간 확보 */
+}
+
+.settings {
+    list-style: none;
+    padding: 0;
+    margin-top: auto; /* 환경설정 메뉴를 하단으로 밀어내기 */
 }
 
 .sidebar ul li {
-    margin: 10px 0;
     padding: 10px;
     background-color: #f4f5f7;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
+    text-align: center; /* 가운데 정렬 */
+    position: relative; /* 드롭다운 메뉴를 위한 상대 위치 설정 */
+    margin-bottom: 10px; /* 메뉴 항목 사이에 간격 추가 */
 }
 
 .sidebar ul li:hover {
     background-color: #e0e0e0;
+}
+
+.sidebar ul li a {
+    text-decoration: none; /* 밑줄 제거 */
+    color: inherit; /* 부모 요소의 색상 상속 */
+    display: block; /* 전체 블록 클릭 가능 */
+}
+
+.sidebar ul li.active {
+    background-color: #eef2ff; /* 선택된 항목 배경색 */
+    color: #4c51bf; /* 선택된 항목 텍스트 색상 */
+    font-weight: bold;
+}
+
+.sidebar ul li.active a {
+    color: #4c51bf;
+}
+
+.icon {
+    margin-right: 10px; /* 아이콘과 텍스트 사이의 간격 */
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 100%;
+    background-color: #ffffff;
+    min-width: 100%;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    flex-direction: column;
+    border-radius: 8px; /* 드롭다운 메뉴의 테두리 반경 */
+}
+
+.dropdown-content li {
+    padding: 10px;
+    text-align: center; /* 드롭다운 메뉴 텍스트 정렬 */
+    margin-bottom: 5px; /* 드롭다운 항목 사이의 간격 */
+}
+
+.dropdown-content li a {
+    color: black;
+    text-decoration: none;
+    display: block;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.dropdown-content li a:hover {
+    background-color: #eef2ff;
+}
+
+.dropdown:hover .dropdown-content {
+    display: flex;
 }
 
 .main-content {

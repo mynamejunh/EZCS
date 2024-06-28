@@ -83,10 +83,15 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'EZCS',
+<<<<<<< HEAD
         # 'USER': 'root',
         # 'PASSWORD': '',
         # 'USER': os.environ['MySQL_ID'],
         # 'PASSWORD': os.environ['MySQL_PW'],
+=======
+        'USER': os.environ['MySQL_ID'],
+        'PASSWORD': os.environ['MySQL_PW'],
+>>>>>>> 783d685edba33a5b57c4cf9911d75b11976edfac
         'HOST': 'localhost',
         'PORT': '3306',
     }

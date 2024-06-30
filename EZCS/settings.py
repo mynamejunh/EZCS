@@ -52,7 +52,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # "accounts.middleware.BlockedMiddleware",
+    "accounts.middleware.BlockedMiddleware",
+    "accounts.middleware.LoginSessionMiddleware",
 ]
 
 ROOT_URLCONF = "EZCS.urls"

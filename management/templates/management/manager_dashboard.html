@@ -5,6 +5,24 @@
 
 {% block content %}
 <div class="dashboard">
-    <!-- 관리자 대시보드 내용 -->
+    <input type="text" placeholder="..." style="width:100%;">
+    <button>검색</button>
+    <br><br>
+    <table>
+        <thead>    
+            <th>username</th>
+            <th>name</th>
+            <th>email</th>
+        </thead> 
+        <tbody>
+            {% for item in data %}
+                <tr>
+                    <td>{{ item.username }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.email }}</td>
+                </tr>        
+            {% endfor %}
+        </tbody>       
+    </table>    
 </div>
 {% endblock %}

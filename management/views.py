@@ -11,16 +11,18 @@ def manager_dashboard(request):
 #상세페이지
 def manager_detail(request, id):
     user = get_object_or_404(User, id=id)
-    # print(post.user)
     return render(request, 'management/management_detail.html', {'user':user})
 
 #개인정보 수정
 def manager_edit(request, id):
+    print('='*100)
+    print(request.method)
+    print('='*100)
     user = get_object_or_404(User, id=id)
     data = {'user': user}
     if request.method == 'GET':
         return render(request, 'management/management_edit.html', data)
     else:
         print(request.method)
-        return render(request, 'management/manager_dashboard.html')
+        return redirect("management:management_detail", id)
     

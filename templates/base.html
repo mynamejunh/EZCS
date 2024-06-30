@@ -16,6 +16,7 @@
         <div class="header">
             <div class="company-name">Company name</div>
             <div class="header-right">
+                {{ request.session }}
                 {% if user %}
                 <div class="profile-info">안녕하세요, {{ user }}님.</div>
                 <div class="logout">

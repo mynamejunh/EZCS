@@ -1,36 +1,155 @@
-<!DOCTYPE html>
-<html lang="en">
-
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
     <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    {% load static %}
+    <script src="{% static 'accounts\js\login.js' %}"></script>
+ 
     <title>회원가입</title>
+    <style>
+        .error-message {
+            color: red;
+            display: none;
+        }
+    </style>
 </head>
-
+<style>
+    .my_container{
+        text-align: -webkit-center;
+        position: relative;
+        top: 150px;
+    }
+</style>
 <body>
-    <h2>회원가입</h2>
+
+    <form id="signupForm" data-url="{% url 'accounts:signup' %}" data-csrf="{{ csrf_token }}"></form>
+    <div class="container-fluid my_container"> 
+        <div>
+            <h2>회원가입</h2>
+        </div>
     <div>
-        <input type="text" class="email">@
-        <select class="form-select" id="validationTooltip04" required>
-        <option selected disabled value="">Choose...</option>
-        <option>naver.com</option>
-        <option>gmail.com</option>
-        <option>daum.net</option>
-        <option>nate.com</option>
-    </select>
+        <input type="text"  id="name" name="name" placeholder="사용자 이름">
     </div>
     <div>
-        <input type="text" name="username" placeholder="사용자 이름">
+        <input type="date" id="birthdate" name="birthdate" placeholder="생년월일">
     </div>
     <div>
-        <input type="password" name="password" placeholder="비밀번호">
+        <input type="password" id="password" name="password" placeholder="비밀번호">
     </div>
+
     <div>
-        <input type="submit" value="회원가입" class="btn btn-primary">
+        <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">E-mail</E-mail></label>
+            <div class="input-group">
+                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" style="width: 15%;">
+                <span class="input-group-text">@</span>
+                <input class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width: 5cm;">
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">naver.com</a></li>
+                    <li><a class="dropdown-item" href="#">gmail.com</a></li>
+                    <li><a class="dropdown-item" href="#">daum.net</a></li>
+                    <li><a class="dropdown-item" href="#">nate.com</a></li>
+                </ul>
+            </div>
+        </div>
     </div>
+
+    <div>
+        <input type="text" id="postcode" name="postcode" placeholder="우편번호">
+        <input type="button" value="검색" onclick="searchPostcode()">
+    </div>
+
+    <div>
+        <input type="submit" value="회원가입" class="btn btn-primary" onclick="signup()">
+        <p><a href="{% url 'accounts:login' %}"> 로그인으로 돌아가기</a></p>
+    </div>
+</div>
 </form>    
+
+    <h2>회원가입</h2>
+    <form method="post" id="signup-form">
+        {% csrf_token %}
+        <div>
+            <label for="username">사용자명:</label>
+            <input type="text" id="username" name="username" required>
+            <p id="username-error" class="error-message">이미 존재하는 사용자명입니다.</p>
+        </div>
+        <div>
+            <label for="password">비밀번호:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div>
+            <label for="password_confirm">비밀번호 확인:</label>
+            <input type="password" id="password_confirm" name="password_confirm" required>
+            <p id="password-error" class="error-message">입력된 비밀번호가 다릅니다.</p>
+        </div>
+        <div>
+            <label for="name">이름:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+            <label for="email">이메일:</label>
+            <input type="email" id="email" name="email" required>
+            <p id="email-error" class="error-message">이미 존재하는 이메일입니다.</p>
+        </div>
+        <button type="submit">가입</button>
+    </form>
+
+    <script>
+        document.getElementById('password_confirm').addEventListener('input', function() {
+            var password = document.getElementById('password').value;
+            var passwordConfirm = document.getElementById('password_confirm').value;
+            var passwordError = document.getElementById('password-error');
+            if (password !== passwordConfirm) {
+                passwordError.style.display = 'block';
+            } else {
+                passwordError.style.display = 'none';
+            }
+        });
+
+        document.getElementById('username').addEventListener('input', function() {
+            var username = document.getElementById('username').value;
+            var usernameError = document.getElementById('username-error');
+            // AJAX call to check if username exists
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', `/check_username/?username=${username}`, true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.exists) {
+                        usernameError.style.display = 'block';
+                    } else {
+                        usernameError.style.display = 'none';
+                    }
+                }
+            };
+            xhr.send();
+        });
+
+        document.getElementById('email').addEventListener('input', function() {
+            var email = document.getElementById('email').value;
+            var emailError = document.getElementById('email-error');
+            // AJAX call to check if email exists
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', `/check_email/?email=${email}`, true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    var response = JSON.parse(xhr.responseText);
+                    if (response.exists) {
+                        emailError.style.display = 'block';
+                    } else {
+                        emailError.style.display = 'none';
+                    }
+                }
+            };
+            xhr.send();
+        });
+    </script>
+
+
 </body>
 </html>

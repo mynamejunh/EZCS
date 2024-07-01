@@ -4,6 +4,7 @@ from .models import User
 import re
 from django.http import HttpResponse
 
+
 def login(request):
     if request.method == 'GET':
         return render(request, 'accounts/login.html')
@@ -34,15 +35,10 @@ def logout(request):
     request.session.pop('user')
     return redirect('/')
 
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
-from .models import User
-
-def adminLogin(request):
-    return render(request, 'accounts/adminlogin.html')
 
 def searchPW(request):
     return render(request, 'accounts/searchpw.html')
+
 
 def signup(request):
     errors = {}
@@ -80,13 +76,11 @@ def signup(request):
                 password=password,
                 name=name,
                 email=email,
-                is_active=False  # 관리자 승인을 기다리는 상태로 설정
+                is_active=False
             )
-            return redirect('/')  # 회원가입 성공 시 메인 페이지로 이동
+            return redirect('/')
 
     return render(request, 'accounts/signup.html', {'errors': errors})
-
-
 
 
 def check_username(request):
@@ -94,8 +88,8 @@ def check_username(request):
     exists = User.objects.filter(username=username).exists()
     return JsonResponse({'exists': exists})
 
+
 def check_email(request):
     email = request.GET.get('email')
     exists = User.objects.filter(email=email).exists()
     return JsonResponse({'exists': exists})
-

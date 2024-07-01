@@ -10,10 +10,12 @@ body {
     height: 100vh;
 }
 
-.container {
+.container-fluid {
     display: flex;
     flex-direction: column;
     flex: 1;
+    width: 100%;
+    padding: 0;
 }
 
 .header {
@@ -69,13 +71,13 @@ body {
     border-radius: 8px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* 변경된 부분 */
+    margin-bottom: 20px;
 }
 
 .logo {
     font-size: 24px;
     font-weight: bold;
-    margin-bottom: 10px; /* 공백을 줄이기 위해 margin-bottom 값을 줄임 */
+    margin-bottom: 30px;
     text-align: center;
 }
 
@@ -83,12 +85,20 @@ body {
     list-style: none;
     padding: 0;
     margin: 0;
+    justify-content: flex-start;
 }
 
 .settings {
     list-style: none;
-    padding: 0;
-    margin-top: auto; /* 환경설정을 하단으로 밀어내기 위해 auto 사용 */
+    justify-content: flex-end;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+ul .settings li .icon {
+    justify-content: end;
+    background-color: blue;
 }
 
 .sidebar ul li {

@@ -1,30 +1,42 @@
-# accounts 앱의 views.py 파일 예시
-
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import login, logout
-
-def signup_view(request):
+from django.http import JsonResponse
+from .models import User
+'''
+def signup(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
-            return redirect('some-redirect-url')  # 회원가입 후 리다이렉트할 URL
+            return redirect('home')  # 회원가입 후 리디렉션할 페이지
     else:
         form = UserCreationForm()
-    return render(request, 'signup.html', {'form': form})
+    return render(request, 'accounts/signup.html', {'form': form})
+'''
 
-def login_view(request):
-    if request.method == 'POST':
-        form = AuthenticationForm(request, request.POST)
-        if form.is_valid():
-            login(request, form.get_user())
-            return redirect('some-redirect-url')  # 로그인 후 리다이렉트할 URL
+def login(request):
+    if request.method == 'GET':
+        return render(request, 'accounts/login.html')
+    elif request.method == 'POST':
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
+        
+        if not (username and password):
+            result = '데이터가 안들어옴'
+        else:
+            try:
+                user = User.objects.get(username=username)
+                if password == user.password:
+                    request.session['user'] = username
+                    result = 'success'
+                else:
+                    result = 'Incorrect password'
+            except User.DoesNotExist:
+                result = 'User does not exist'
     else:
-        form = AuthenticationForm()
-    return render(request, 'login.html', {'form': form})
+        result = 'request.method != POST'
 
+<<<<<<< HEAD
 def logout_view(request):
     if request.method == 'POST':
         logout(request)
@@ -33,3 +45,10 @@ def logout_view(request):
 
 def userSetting_View(request):
     return render(request, 'accounts/userSetting.html')
+=======
+    return JsonResponse({'result': result})
+
+def logout(request):
+    request.session.pop('user')
+    return redirect('/')
+>>>>>>> acfe340e4b4a4a5de7d8011315378812c1d2e564

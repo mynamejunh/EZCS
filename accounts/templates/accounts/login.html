@@ -136,10 +136,10 @@
                 <input type="button" value="로그인" class="btn btn-outline-primary" style="width: 5cm;" onclick="check_login()">
             </div>
             <div>
-                <input type="button" value="관리자 로그인" class="btn btn-outline-primary" style="width: 5cm;">
+                <input type="button" value="관리자 로그인" class="btn btn-outline-primary" style="width: 5cm;" href="{% url 'accounts:adminLogin' %}" >
             </div>
             <div>
-                <p><a href="{% url 'accounts:signup' %}">회원가입</a> | <a href="password.html">비밀번호 찾기</a></p>
+                <p><a href="{% url 'accounts:signup' %}">회원가입</a> | <a href="{% url 'accounts:searchPW' %}">비밀번호 찾기</a></p>
 
             </div>
         </div>

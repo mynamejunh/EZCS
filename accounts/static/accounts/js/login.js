@@ -24,9 +24,6 @@ function check_login(event) {
     });
 }
 
-$(document).ready(function () {
-    $("#loginForm").on("submit", check_login);
-});
 
 function check_admin_login(event) {
     let param = {

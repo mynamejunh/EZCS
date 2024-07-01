@@ -38,6 +38,12 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .models import User
 
+def adminLogin(request):
+    return render(request, 'accounts/adminlogin.html')
+
+def searchPW(request):
+    return render(request, 'accounts/searchpw.html')
+
 def signup(request):
     errors = {}
     if request.method == 'POST':

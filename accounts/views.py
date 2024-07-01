@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .models import User
+
 '''
 def signup(request):
     if request.method == 'POST':
@@ -43,5 +44,4 @@ def logout(request):
     return redirect('/')
 
 def signup(request):
-    # 회원가입 페이지로 리다이렉트
     return render(request, 'accounts/signup.html')

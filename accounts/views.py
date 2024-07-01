@@ -35,20 +35,9 @@ def login(request):
                 result = 'User does not exist'
     else:
         result = 'request.method != POST'
-
-<<<<<<< HEAD
-def logout_view(request):
-    if request.method == 'POST':
-        logout(request)
-        return redirect('some-redirect-url')  # 로그아웃 후 리다이렉트할 URL
-    
-
-def userSetting_View(request):
-    return render(request, 'accounts/userSetting.html')
-=======
     return JsonResponse({'result': result})
+
 
 def logout(request):
     request.session.pop('user')
     return redirect('/')
->>>>>>> acfe340e4b4a4a5de7d8011315378812c1d2e564

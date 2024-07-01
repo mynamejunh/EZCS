@@ -39,17 +39,18 @@
                         <a href="{% url 'counseling:list' %}"><span class="icon">💼</span> 상담</a>
                     </li>
                     <li class="dropdown">
-                        <a href="{% url 'education:list' %}"><span class="icon">📚</span> 교육</a>
+                        <a href="javascript:void(0)"><span class="icon">📚</span> 교육</a>
                         <ul class="dropdown-content">
-                            <li><a href="#">롤플레잉</a></li>
-                            <li><a href="#">퀴즈</a></li>
-                            <li><a href="#">교육 이력</a></li>
+                            <li><a href="{% url 'education:list' %}">롤플레잉</a></li>
+                            <li><a href="{% url 'education:quiz' %}">퀴즈</a></li>
+                            <li><a href="{% url 'education:edu_history' %}">교육 이력</a></li>
+                            <li><a href="{% url 'education:details' %}">교육 이력 상세 일단보세용</a></li>
                         </ul>
                     </li>
                 </ul>
                 <ul class="settings">
                     <li>
-                        <a href="{% url 'accounts:userSetting' %}"><span class="icon">⚙️</span> 환경설정</a>
+                        <a href="#"><span class="icon">⚙️</span> 환경설정</a>
                     </li>
                 </ul>
             </div>
@@ -60,6 +61,12 @@
             </div>
         </div>
     </div>
+    <footer class="footer">
+        <div class="footer-content">
+            풋터 내용
+        </div>
+    </footer>
+    <script src="{% static 'js/menu.js' %}"></script>
 </body>
 
 </html>

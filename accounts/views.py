@@ -41,3 +41,7 @@ def login(request):
 def logout(request):
     request.session.pop('user')
     return redirect('/')
+
+def signup(request):
+    # 회원가입 페이지로 리다이렉트
+    return render(request, 'accounts/signup.html')

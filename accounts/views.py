@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .models import User
+
 '''
 def signup(request):
     if request.method == 'POST':
@@ -41,3 +42,9 @@ def login(request):
 def logout(request):
     request.session.pop('user')
     return redirect('/')
+<<<<<<< HEAD
+=======
+
+def signup(request):
+    return render(request, 'accounts/signup.html')
+>>>>>>> d4f9ed381b72492f33f73c56e90cfdc5e49ee743

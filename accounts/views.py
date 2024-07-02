@@ -43,14 +43,6 @@ def searchPW(request):
 def signup(request):
     errors = {}
     if request.method == 'POST':
-<<<<<<< HEAD
-        logout(request)
-        return redirect('some-redirect-url')  # 로그아웃 후 리다이렉트할 URL
-    
-
-def userSetting_View(request):
-    return render(request, 'accounts/userSetting.html')
-=======
         username = request.POST.get('username')
         password = request.POST.get('password')
         password_confirm = request.POST.get('password_confirm')
@@ -101,4 +93,3 @@ def check_email(request):
     email = request.GET.get('email')
     exists = User.objects.filter(email=email).exists()
     return JsonResponse({'exists': exists})
->>>>>>> 307b05c8221d89bfb6c303c85b6296ecde256078

@@ -30,6 +30,7 @@ messages ="너는 친절하고 상냥하고 유능한 고객센터 상담원을 
 
 chatbot = Chatbot(os.getenv("OPENAI_API_KEY"), 'database/chroma.sqlite3', messages) # chatbot 객체 생성
 
+
 def chat_view(request):
     global chatbot
     if request.method == 'POST':
@@ -74,6 +75,7 @@ def chat_view(request):
 
     return render(request, 'education/index.html')
 
+<<<<<<< HEAD
 
 
 def chat_view_test(request):
@@ -119,3 +121,5 @@ def chat_view_test(request):
             return JsonResponse({'response': output})
 
     return render(request, 'education/chat.html')
+=======
+>>>>>>> 3a71015c09acc71f09fea5cf84544aadbb86a3c1

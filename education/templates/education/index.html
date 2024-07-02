@@ -62,12 +62,12 @@
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Chatbot initialized:', data);
-            appendMessage('bot', data.initial_question); // 첫 질문 출력
-        })
-        .catch(error => console.error('Error:', error));
+            .then(response => response.json())
+            .then(data => {
+                console.log('Chatbot initialized:', data);
+                appendMessage('bot', data.initial_question); // 첫 질문 출력
+            })
+            .catch(error => console.error('Error:', error));
     }
 
     function sendMessage(event) {
@@ -90,12 +90,12 @@
                 'X-CSRFToken': getCookie('csrftoken')
             }
         })
-        .then(response => response.json())
-        .then(data => {
-            // Append bot response to chat box
-            appendMessage('bot', data.response);
-        })
-        .catch(error => console.error('Error:', error));
+            .then(response => response.json())
+            .then(data => {
+                // Append bot response to chat box
+                appendMessage('bot', data.response);
+            })
+            .catch(error => console.error('Error:', error));
     }
 
     function appendMessage(sender, message) {
@@ -122,7 +122,7 @@
         return cookieValue;
     }
 
-    document.getElementById("question").addEventListener("keydown", function(event) {
+    document.getElementById("question").addEventListener("keydown", function (event) {
         if (event.keyCode === 13 && !event.shiftKey) {
             event.preventDefault();
             document.getElementById("text-button").click();

@@ -40,10 +40,21 @@ def allow(request):
     print('='*20)
     return render(request, 'management/allow.html',{'data':data})
 
+
+# 가입승인페이지
+def manager_user(request):
+    data = User.objects.filter(active_status = 0)
+    return render(request, 'management/manager_user.html',{'data':data})
+
+# def allow_detail(request, id):
+#     user = User.objects.get(id=id)
+#     return render(request, 'management/management_detail.html', {'user':user})   
+
 def allow_detail(request, id):
     user = get_object_or_404(User, id=id)
     print(user)
     return render(request, 'management/allow_detail.html', {'user':user})   
+
 
 #승인
 def approve_user(request, id):

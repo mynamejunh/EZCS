@@ -7,7 +7,7 @@ function check_login(obj) {
     var from = $("#loginForm");
     var url = from.data("url");
     var csrf = from.data("csrf");
-    
+
     $.ajax({
         url: url,
         type: "post",
@@ -22,7 +22,7 @@ function check_login(obj) {
             } else {
                 if ((obj == 0 && data.result == "user") || (obj == 0 && data.result == "manager")) {
                     location.href = "/";
-                } 
+                }
                 else if (obj == 1 && data.result == "manager") {
                     location.href = "/management";
                 } else {
@@ -33,10 +33,10 @@ function check_login(obj) {
     });
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
     $('#loginUsername').focus();
-    $('#loginPassword').keypress(function(event) {
-        if (event.which == 13) { 
+    $('#loginPassword').keypress(function (event) {
+        if (event.which == 13) {
             check_login(0);
         }
     });

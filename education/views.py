@@ -75,9 +75,6 @@ def chat_view(request):
 
     return render(request, 'education/index.html')
 
-<<<<<<< HEAD
-
-
 def chat_view_test(request):
     global chatbot
     if request.method == 'POST':
@@ -121,5 +118,3 @@ def chat_view_test(request):
             return JsonResponse({'response': output})
 
     return render(request, 'education/chat.html')
-=======
->>>>>>> 3a71015c09acc71f09fea5cf84544aadbb86a3c1

@@ -1,0 +1,40 @@
+{% extends 'accountsLayout.html' %}
+{% block title %}로그인{% endblock %}
+
+{% block content %}
+<form id="loginForm" data-url="{% url 'accounts:login' %}" data-csrf="{{ csrf_token }}">
+    <div class="container-sm my_container">
+        <div class="p-3 text-primary-emphasis bg-primary-subtle border border-primary-subtle rounded-3">
+            21조에 오신 것을 환영합니다! 👋
+        </div>
+        <div>
+            <h2>로그인</h2>
+        </div>
+        <div class="form-floating mb-3 my-form">
+            <input type="text" class="form-control" id="loginUsername" name="loginUsername">
+            <label for="loginUsername">ID</label>
+        </div>
+        <div class="form-floating mb-3 my-form">
+            <input type="password" class="form-control" id="loginPassword" name="loginPassword">
+            <label for="loginPassword">Password</label>
+        </div>
+        <div class="form-check form-switch my-form">
+            <input class="form-check-input" type="checkbox" role="switch" id="flexCheckDefault">
+            <label class="form-check-label" for="flexCheckDefault">로그인 정보 저장</label>
+        </div>
+        <div>
+            <input type="button" value="로그인" class="btn btn-outline-primary" style="width: 5cm;" onclick="check_login()">
+        </div>
+        <div>
+            <input type="button" value="관리자 로그인" class="btn btn-outline-primary" style="width: 5cm;" onclick="check_login()">
+        </div>
+        <div>
+            <p>
+                <a href="{% url 'accounts:signup' %}">회원가입</a>
+                |
+                <a href="{% url 'accounts:searchPW' %}">비밀번호 찾기</a>
+            </p>
+        </div>
+    </div>
+</form>
+{% endblock %}

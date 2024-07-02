@@ -1,0 +1,31 @@
+form {
+    height: 100%;
+    cursor: default;
+}
+div {
+    padding: 5px;
+}
+
+.my_container {
+    max-width: 400px;
+    text-align: -webkit-center;
+    position: relative;
+    top: 150px;
+}
+
+.my-form {
+    width: 70%;
+}
+
+.form-check {
+    width: fit-content;
+}
+
+.form-check > .form-check-input,
+.form-check-label {
+    cursor: pointer;
+}
+
+.my-form > label {
+    font-size: 12px;
+}

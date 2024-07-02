@@ -8,10 +8,18 @@
 
 __pycache__/
 
+**/__pycache__/
+
 migrations/
 
 local_settings.py
 
+chroma.sqlite3
+
+chat_test.py
+
 db.sqlite3
 
 db.sqlite3-journal media
+
+.env

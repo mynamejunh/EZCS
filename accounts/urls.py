@@ -11,4 +11,4 @@ urlpatterns = [
     path('searchPW/', views.searchPW, name='searchPW'),
     path('check_username/', views.check_username, name='check_username'),
     path('check_email/', views.check_email, name='check_email'),
-
+]

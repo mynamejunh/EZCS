@@ -67,6 +67,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     
     birth_date = models.DateField(
+        null=True,
         verbose_name="User's Birth Date",
         db_comment="User's Birth Date"
     )

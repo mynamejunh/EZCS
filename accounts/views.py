@@ -63,6 +63,10 @@ def logout(request):
     return redirect('/')
 
 
+def adminLogin(request):
+    return render(request, 'accounts/adminlogin.html')
+
+
 def searchPW(request):
     return render(request, 'accounts/searchpw.html')
 

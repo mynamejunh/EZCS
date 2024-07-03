@@ -1,6 +1,7 @@
 function signup() {
     let username = $("#loginUsername").val();
     let name = $("#name").val();
+
     if (containsKorean(username)) {
         $("#usernameError").text("아이디는 한글을 포함할 수 없습니다.");
         $("#usernameError").show();
@@ -17,12 +18,29 @@ function signup() {
         $("#nameError").hide();
     }
 
+    
     let password = $("#password").val();
     let password_confirm = $("#pwChk").val();
 
     if (password != password_confirm) {
         alert("비번 다름");
         return false;
+    }
+    
+    if (!validatePassword(password)) {
+        $("#passwordError").text("비밀번호는 최소 8자 이상이어야 하며, 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다.");
+        $("#passwordError").show();
+        return false;
+    } else {
+        $("#passwordError").hide();
+    }
+
+    if (password !== password_confirm) {
+        $("#passwordConfirmError").text("비밀번호가 일치하지 않습니다.");
+        $("#passwordConfirmError").show();
+        return false;
+    } else {
+        $("#passwordConfirmError").hide();
     }
     // email: $("#email").val() + "@" + $("#emailadd").val(),
     $("#addressCode").removeAttr("disabled");
@@ -72,6 +90,10 @@ function containsKorean(text) {
     return koreanRegex.test(text);
 }
 
+function validatePassword(password) {
+    var passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(password);
+}
 function displayErrors(errors) {
     for (let key in errors) {
         let errorDiv = $("#" + key + "Error");

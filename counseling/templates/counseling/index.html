@@ -9,24 +9,42 @@
     <div class="consultation-container">
         <div class="customer-info">
             <h2>고객 정보</h2>
-            <ul>
-                <li>고객명</li>
-                <li>생년월일</li>
-                <li>전화번호</li>
-                <li>주소</li>
-                <li>가입일</li>
-            </ul>
-            <div class="buttons">
-                <button class="save-button">저장</button>
-                <button class="save-button">초기화</button>
-                <button class="cancel-button">취소</button>
-            </div>
-        </div>
+            <form id="customer-form">
+                <ul>
+                    <li>
+                        <label for="customer-name">고객명</label>
+                        <input type="text" id="customer-name" name="customer-name" disabled>
+                    </li>
+                    <li>
+                        <label for="birthdate">생년월일</label>
+                        <input type="date" id="birthdate" name="birthdate" disabled>
+                    </li>
+                    <li>
+                        <label for="phone">전화번호</label>
+                        <input type="tel" id="phone" name="phone" disabled>
+                    </li>
+                    <li>
+                        <label for="address">주소</label>
+                        <input type="text" id="address" name="address" disabled>
+                    </li>
+                    <li>
+                        <label for="join-date">가입일</label>
+                        <input type="date" id="join-date" name="join-date" disabled>
+                    </li>
+                </ul>
+                <div class="buttons">
+                    <input type="button" class="edit-button" value="수정" onclick="editCustomerInfo()">
+                    <input type="button" class="save-button" value="저장" onclick="saveCustomerInfo()" style="display: none;">
+                    <input type="reset" class="save-button" value="초기화" style="display: none;">
+                    <input type="button" class="cancel-button" value="취소" onclick="cancelEdit()" style="display: none;">
+                </div>
+            </form>
+        </div>        
         <div class="stt-content">
             <h2>상담내용 변환 창</h2>
             <div class="stt">
-                <button id="start-button">마이크 연결</button>
-                <button id="stop-button" disabled>마이크 연결 끊기</button>
+                <input type="button" id="start-button" value="마이크 연결">
+                <input type="button" id="stop-button" value="마이크 연결 끊기" disabled>
                 <div id="transcription">여기에 음성 입력 내용이 표시됩니다...</div>
             </div>
             <div class="recommended-answer">추천 응대 멘트</div>
@@ -44,10 +62,49 @@
                 <div class="memo-block">조치 내용</div>
             </div>
         </div>
+    </div>
 </div>
 
-
 <script>
+    function editCustomerInfo() {
+        const form = document.getElementById('customer-form');
+        const inputs = form.querySelectorAll('input');
+        inputs.forEach(input => input.disabled = false);
+
+        document.querySelector('.edit-button').style.display = 'none';
+        document.querySelectorAll('.save-button, .cancel-button').forEach(button => {
+            button.style.display = 'inline-block';
+        });
+    }
+
+    function saveCustomerInfo() {
+        const form = document.getElementById('customer-form');
+        const inputs = form.querySelectorAll('input');
+        inputs.forEach(input => input.disabled = true);
+
+        // Add logic to save customer info, e.g., sending data to the server
+        alert('고객 정보가 저장되었습니다.');
+
+        document.querySelector('.edit-button').style.display = 'inline-block';
+        document.querySelectorAll('.save-button, .cancel-button').forEach(button => {
+            button.style.display = 'none';
+        });
+    }
+
+    function cancelEdit() {
+        const form = document.getElementById('customer-form');
+        const inputs = form.querySelectorAll('input');
+        inputs.forEach(input => input.disabled = true);
+
+        // Add logic to handle canceling the edit, e.g., reverting changes
+        alert('수정이 취소되었습니다.');
+
+        document.querySelector('.edit-button').style.display = 'inline-block';
+        document.querySelectorAll('.save-button, .cancel-button').forEach(button => {
+            button.style.display = 'none';
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const startButton = document.getElementById('start-button');
         const stopButton = document.getElementById('stop-button');

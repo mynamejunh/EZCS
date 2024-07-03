@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+# CSRF_TRUSTED_ORIGINS = ['url']
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -163,3 +165,8 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_AGE = 60 * 60 * 3
 
 SESSION_SAVE_EVERY_REQUEST = True
+
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.CustomUserBackend',
+]
+

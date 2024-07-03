@@ -14,7 +14,7 @@ urlpatterns = [
     # path('user_inactive/<int:id>/', views.user_inactive, name='user_inactive'),
     # path('reject/<int:id>/', views.reject_user, name='reject_user'),
 
-    path('quitter/', views.quitter, name='quitter'),
+    # path('quitter/', views.quitter, name='quitter'),
     path('manager_user/', views.manager_user, name='manager_user'),
 
     path('inactive/', views.inactive, name='inactive'),

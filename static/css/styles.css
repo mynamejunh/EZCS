@@ -1,7 +1,5 @@
-/* css/styles.css */
-
 body {
-    background-color: #e0e0e0;
+    background-color: #ffffff;
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
@@ -14,19 +12,19 @@ body {
     display: flex;
     flex-direction: column;
     flex: 1;
-    background-color: #e4e7e9;
+    background-color: #edf2f4;
 }
 
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #343a40;
+    background-color: #2b2d42;
     color: white;
     padding: 10px 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
-    margin: 20px;
+    margin: 20px 20px 0px 20px;
 }
 
 .company-name {
@@ -47,15 +45,27 @@ body {
 
 .header-right .logout {
     cursor: pointer;
-    background-color: #dc3545;
+    background-color: #2EC4B6;
     color: white;
     padding: 10px 20px;
     border-radius: 5px;
     transition: background-color 0.3s;
+    text-decoration: none;
+}
+
+.header-right .logout a {
+    text-decoration: none; /* 링크의 밑줄 제거 */
+    color: white; /* 링크 텍스트 색상 흰색으로 설정 */
+    display: block; /* 전체 영역을 클릭할 수 있도록 설정 */
 }
 
 .header-right .logout:hover {
-    background-color: #c82333;
+    background-color: #E71D36;
+    color: white;
+}
+
+.header-right .logout a:hover {
+    color: black; /* 호버 시 링크 텍스트 색상 검정으로 설정 */
 }
 
 .main-content-wrapper {
@@ -67,15 +77,8 @@ body {
 
 .sidebar {
     width: 250px;
-    background-color: #343a40;
-    padding: 20px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
     display: flex;
     flex-direction: column;
-    margin-bottom: 20px;
-    position: sticky;
-    top: 20px;
 }
 
 .logo {
@@ -83,7 +86,7 @@ body {
     font-weight: bold;
     margin-bottom: 20px;
     text-align: center;
-    color: #ffffff;
+    color: #2b2d42;
 }
 
 .menu, .settings {
@@ -101,70 +104,78 @@ body {
     text-align: center;
     position: relative;
     margin-bottom: 10px;
+    border: 1px solid #ccc; /* 경계선 추가 */
 }
 
-.sidebar ul li:hover {
-    background-color: #e0e0e0;
-    color: #495057;
-}
+/* .sidebar ul li:hover {
+    background-color: #8d99ae;
+    color: white;
+} */
 
 .sidebar ul li a {
     text-decoration: none;
     color: inherit;
-    display: block;
+    display: flex;
+    align-items: center;
+    width: 100%;
 }
 
 .sidebar ul li.active {
-    background-color: #eef2ff;
-    color: #4c51bf;
+    background-color: #2EC4B6;
+    color: white;
     font-weight: bold;
 }
 
 .sidebar ul li.active a {
-    color: #4c51bf;
+    color: white;
 }
 
 .icon {
     margin-right: 10px;
+    font-size: 18px; /* 아이콘 크기 조정 */
 }
 
-.dropdown-content {
+.accordion .accordion-toggle {
+    cursor: pointer;
+}
+
+.accordion-content {
     display: none;
-    background-color: #ffffff;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-    z-index: 1;
     flex-direction: column;
-    border-radius: 8px;
-    padding: 0;
-    margin-top: 10px;
 }
 
-.dropdown-content.show {
+.accordion-content.show {
     display: flex;
 }
 
-.dropdown-content li {
-    padding: 10px;
-    text-align: center;
+
+.accordion-content ul {
+    list-style-type: none; /* 리스트 데코레이터 제거 */
+    padding: 0;
     margin: 0;
-    list-style: none;
 }
 
-.dropdown-content li:not(:last-child) {
-    border-bottom: 1px solid #e0e0e0;
+
+.accordion-content li {
+    border-bottom: 1px solid #e0e0e0; /* 각 항목에 경계선 추가 */
+    padding: 10px; /* 패딩 추가 */
+    background-color: #f9f9f9; /* 배경색 추가 */
 }
 
-.dropdown-content li a {
+
+.accordion-content li a {
     color: black;
     text-decoration: none;
     display: block;
-    padding: 10px;
+    padding: 10px 15px; /* 패딩 조정 */
     border-radius: 0;
 }
 
-.dropdown-content li a:hover {
-    background-color: #eef2ff;
+.accordion-content li a:hover {
+    background-color: #2EC4B6;
+    color: white; /* 텍스트 색상을 흰색으로 설정 */
 }
+
 
 .main-content {
     flex: 1;
@@ -178,15 +189,16 @@ body {
 }
 
 .footer {
-    background-color: #343a40;
+    background-color: #2b2d42;
     color: white;
-    padding: 10px 20px;
+    padding: 20px;
     text-align: center;
-    width: calc(100% - 40px); /* 헤더와 동일한 너비로 설정 */
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 0 0 8px 8px; /* 하단 모서리만 둥글게 */
+    border-radius: 0 0 8px 8px;
     margin: 0 20px 20px 20px;
-    flex-shrink: 0;  /* 푸터가 줄어들지 않도록 설정 */
+    flex-shrink: 0;
+    position: relative;
+    bottom: 0;
 }
 
 .footer-content {
@@ -195,7 +207,7 @@ body {
     text-align: center; /* 풋터 내용 가운데 정렬 */
 }
 
-ul.menu, ul.dropdown-content, ul.settings, .dropdown-content li {
+ul.menu, ul.accordion-content, ul.settings, .accordion-content li {
     list-style-type: none;
     padding: 0;
     margin: 0;

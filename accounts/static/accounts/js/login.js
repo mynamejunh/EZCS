@@ -33,10 +33,10 @@ function check_login(obj) {
     });
 }
 
-$(document).ready(function () {
+$(document).ready(function() {
     $('#loginUsername').focus();
-    $('#loginPassword').keypress(function (event) {
-        if (event.which == 13) {
+    $('#loginPassword').keypress(function(event) {
+        if (event.which == 13) { 
             check_login(0);
         }
     });

@@ -69,6 +69,7 @@
     box-sizing: border-box;
     overflow: hidden; /* 섹션 내의 요소들이 넘치지 않도록 설정 */
     height: 100%; /* 부모 컨테이너의 전체 높이에 맞춤 */
+    width: 100%;
 }
 
 .chat-header {
@@ -95,6 +96,10 @@
     border-radius: 5px;
     overflow-y: auto;
     white-space: pre-line;
+    word-wrap: break-word; /* 긴 단어나 URL이 줄바꿈 되도록 설정 */
+    max-width: 100%; /* 가로 사이즈를 고정 */
+    display: flex; /* 추가: 메시지 요소들을 Flexbox 컨테이너로 설정 */
+    flex-direction: column; /* 추가: 메시지 요소들을 세로로 정렬 */
 }
 
 .input-container {
@@ -127,4 +132,24 @@ textarea {
 #text-button:hover {
     background-color: #0056b3;
     transform: translateY(-2px);
+}
+
+/* 추가된 스타일 */
+.message {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    max-width: 80%; /* 최대 너비 설정 */
+    word-wrap: break-word;
+}
+
+.message.bot {
+    background-color: #e0e0e0;
+    align-self: flex-start; /* 봇 메시지는 왼쪽 정렬 */
+}
+
+.message.user {
+    background-color: #007bff;
+    color: white;
+    align-self: flex-end; /* 사용자 메시지는 오른쪽 정렬 */
 }

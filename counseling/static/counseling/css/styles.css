@@ -35,7 +35,7 @@ body {
     border-radius: 8px; /* 모서리 둥글게 */
     display: flex;
     flex-direction: column;
-    overflow: hidden; /* 상담내용 변환 창에서 스크롤을 없애기 위해 추가 */
+    overflow: scroll; /* 상담내용 변환 창에서 스크롤을 없애기 위해 추가 */
 }
 
 .stt-content .stt, .translation {

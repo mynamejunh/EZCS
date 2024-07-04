@@ -26,6 +26,10 @@ body {
     z-index: 1000;
 }
 
+.sidebar.hidden {
+    transform: translateX(-100%);
+}
+
 .sidebar h1 {
     font-size: 24px;
     margin-bottom: 20px;
@@ -184,14 +188,29 @@ body {
     margin: 5px 0;
 }
 
+.sidebar-toggle {
+    display: none;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.sidebar-toggle:hover {
+    background-color: #0056b3;
+}
+
 @media (max-width: 768px) {
     .sidebar {
-        width: 100%;
-        height: auto;
-        position: relative;
-        padding: 10px;
-        border-right: none;
-        border-bottom: 1px solid #e0e0e0;
+        transform: translateX(-100%);
+    }
+
+    .sidebar-toggle {
+        display: block;
     }
 
     .content {

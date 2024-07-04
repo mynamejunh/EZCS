@@ -11,8 +11,8 @@ def list(request):
 
 
 stt_model = STTModel(
-    client_id=os.getenv('client_id'),
-    client_secret=os.getenv('client_secret'),
+    client_id=os.getenv('CLIENT_ID'),
+    client_secret=os.getenv('CLIENT_SECRET'),
 )
 
 logger = logging.getLogger(__name__)

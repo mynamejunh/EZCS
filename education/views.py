@@ -20,44 +20,44 @@ from .models import Quiz, QuizHistroy
 from .forms import QuizForm
 
 def quiz(request):
-    results = {}
-    quizzes = Quiz.objects.order_by('?')[:5]
+    results = {}  # 결과를 저장할 딕셔너리 초기화
+    quizzes = Quiz.objects.order_by('?')[:5]  # 퀴즈 5개를 랜덤으로 가져오기
     
-    if request.method == 'POST':
-        answers = request.POST.getlist('answers')
-        quiz_ids = request.POST.getlist('quiz_ids')
+    if request.method == 'POST':  # 폼 제출이 POST 요청으로 이루어질 때
+        answers = request.POST.getlist('answers')  # 사용자가 제출한 답변 목록 가져오기
+        quiz_ids = request.POST.getlist('quiz_ids')  # 퀴즈 ID 목록 가져오기
         
-        correct_answers = 0
+        correct_answers = 0  # 정답 개수를 세기 위한 변수 초기화
 
-        for idx, answer in enumerate(answers):
-            quiz = Quiz.objects.get(id=quiz_ids[idx])
-            is_correct = False
-            if quiz.flag == 0 and quiz.answer == answer:
-                is_correct = True
-                correct_answers += 1
-            elif quiz.flag == 1 and str(quiz.answer) == answer:
-                is_correct = True
-                correct_answers += 1
+        for idx, answer in enumerate(answers):  # 제출된 답변들을 순회하면서
+            quiz = Quiz.objects.get(id=quiz_ids[idx])  # 현재 퀴즈 ID로 퀴즈 객체 가져오기
+            is_correct = False  # 초기 값은 오답으로 설정
+            if quiz.flag == 0 and quiz.answer == answer:  # 단답형 퀴즈의 경우
+                is_correct = True  # 정답일 경우
+                correct_answers += 1  # 정답 개수 증가
+            elif quiz.flag == 1 and str(quiz.answer) == answer:  # 객관식 퀴즈의 경우
+                is_correct = True  # 정답일 경우
+                correct_answers += 1  # 정답 개수 증가
             
-            results[quiz.id] = {
+            results[quiz.id] = {  # 결과 딕셔너리에 현재 퀴즈의 정답 여부와 사용자의 답변 저장
                 'is_correct': is_correct,
                 'user_answer': answer
             }
 
-        is_passed = correct_answers >= 3
-        categories = [Quiz.objects.get(id=quiz_id).category for quiz_id in quiz_ids]
-        category = categories[0] if categories else 1
+        is_passed = correct_answers >= 3  # 3개 이상의 정답이면 통과로 설정
+        categories = [Quiz.objects.get(id=quiz_id).category for quiz_id in quiz_ids]  # 퀴즈 ID로 각 퀴즈의 카테고리 가져오기
+        category = categories[0] if categories else 1  # 카테고리가 존재하면 첫 번째 카테고리, 아니면 기본값 1
 
-        history = QuizHistroy(
+        history = QuizHistroy(  # QuizHistroy 객체 생성
             category=category,
             is_passed=is_passed,
-            user_id=request.user  # request.user를 직접 할당
+            user_id=request.user  # 현재 로그인된 사용자 ID
         )
-        history.save()
+        history.save()  # QuizHistroy 객체 저장
 
-        return JsonResponse({'results': results})
+        return JsonResponse({'results': results})  # 결과를 JSON 형태로 반환
 
-    return render(request, 'education/quiz.html', {'quizzes': quizzes, 'results': results})
+    return render(request, 'education/quiz.html', {'quizzes': quizzes, 'results': results})  # GET 요청일 경우 퀴즈 페이지 렌더링
 
 
 # 교육이력페이지

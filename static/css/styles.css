@@ -67,9 +67,9 @@ body {
 
 .sidebar .menu .submenu {
     list-style: none;
-    padding: 0 0 0 20px; /* 서브메뉴 들여쓰기 적용 */
+    padding: 0 0 0 20px;
     margin: 0;
-    display: block; /* 서브메뉴 항상 표시 */
+    display: block;
 }
 
 .sidebar .menu .submenu li {
@@ -77,21 +77,20 @@ body {
 }
 
 .sidebar .menu .submenu a {
-    padding: 5px 15px; /* 서브메뉴 항목 패딩 조정 */
+    padding: 5px 15px;
 }
 
 .sidebar .menu .submenu a.active {
     color: #1c90f3;
 }
 
-/* 서브메뉴 토글 화살표 제거 */
 .has-submenu > a::after {
     content: none;
 }
 
 .content {
     flex-grow: 1;
-    margin-left: 200px; /* 사이드바와 겹치지 않게 하기 위해 추가 */
+    margin-left: 200px;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -117,7 +116,7 @@ body {
 
 .profile-info {
     font-size: 16px;
-    margin-right: auto; /* 왼쪽 정렬을 위해 추가 */
+    margin-right: auto;
     padding: 0px 0px 0px 30px;
 }
 
@@ -150,7 +149,7 @@ body {
     align-items: center;
     flex-direction: column;
     margin-left: 40px;
-    overflow: hidden; /* Prevent overflow */
+    overflow: hidden;
 }
 
 .footer {
@@ -166,7 +165,25 @@ body {
     flex-shrink: 0;
 }
 
-/* 미디어 쿼리 추가 */
+.footer-content {
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+}
+
+.footer-content a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+.footer-content a:hover {
+    text-decoration: underline;
+}
+
+.footer-content p {
+    margin: 5px 0;
+}
+
 @media (max-width: 768px) {
     .sidebar {
         width: 100%;

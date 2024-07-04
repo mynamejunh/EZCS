@@ -4,6 +4,7 @@ from django.contrib.sessions.backends.db import SessionStore
 from django.conf import settings
 from django.contrib.auth.signals import user_logged_in
 
+
 class UserManager(BaseUserManager):
     """_summary_
 
@@ -29,6 +30,7 @@ class UserManager(BaseUserManager):
 
     def get_by_natural_key(self, username):
         return self.get(username=username)
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     """

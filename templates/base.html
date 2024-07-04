@@ -15,10 +15,10 @@
             <h1>EZCS</h1>
             <p class="menu-title">MAIN MENU</p>
             <ul class="menu">
-                <li><a href="{% url 'main:user_dashboard' %}"><span class="icon">🏠</span> 대시보드</a></li>
-                <li><a href="{% url 'counseling:list' %}"><span class="icon">💱</span> 상담</a></li>
+                <li><a href="{% url 'main:user_dashboard' %}">대시보드</a></li>
+                <li><a href="{% url 'counseling:list' %}">상담</a></li>
                 <li class="has-submenu {% if request.path == '/education/' %}active{% endif %}">
-                    <a href="#"><span class="icon">📊</span> 교육</a>
+                    <a href="{% url 'education:chat_view' %}">교육</a>
                     <ul class="submenu">
                         <li><a href="{% url 'education:chat_view' %}" class="{% if request.path == '/education/' %}active{% endif %}">롤플레잉</a></li>
                         <li><a href="{% url 'education:quiz' %}" class="{% if request.path == '/education/quiz/' %}active{% endif %}">퀴즈</a></li>
@@ -41,7 +41,7 @@
             <button class="sidebar-toggle" id="sidebarToggle">☰</button>
             <div class="header-right">
                 {% if user %}
-                <div class="profile-info">안녕하세요, {{ user }}님.</div>
+                <div class="profile-info">{{ user }}님, 오늘 하루도 화이팅 하세요.</div>
                 <div class="logout">
                     <a href="{% url 'accounts:logout' %}">로그아웃</a>
                 </div>
@@ -62,12 +62,6 @@
         </footer>
     </div>
     <script src="{% static 'js/menu.js' %}"></script>
-    <script>
-        document.getElementById('sidebarToggle').addEventListener('click', function () {
-            var sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('active');
-        });
-    </script>
 </body>
 
 </html>

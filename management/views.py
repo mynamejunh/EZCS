@@ -12,7 +12,7 @@ def manager_dashboard(request):
 #상세페이지
 def manager_detail(request, id):
     user = get_object_or_404(User, id=id)
-    return render(request, 'management/management_detail.html', {'user':user})
+    return render(request, 'management/detail.html', {'user':user})
 
 #개인정보 수정
 def manager_edit(request, id):
@@ -35,7 +35,7 @@ def manager_edit(request, id):
         # user.role = request.POST.get('role') #역할
         # user.active_status = request.POST.get('active_status') #활동상태
         user.save()
-        return redirect("management:management_detail", id)
+        return redirect("management:detail", id)
 
 
 # 가입승인페이지

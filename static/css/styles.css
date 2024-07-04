@@ -69,9 +69,9 @@ body {
 
 .sidebar .menu .submenu {
     list-style: none;
-    padding: 0;
+    padding: 0 0 0 20px; /* 서브메뉴 들여쓰기 적용 */
     margin: 0;
-    display: none;
+    display: block; /* 서브메뉴 항상 표시 */
 }
 
 .sidebar .menu .submenu li {
@@ -79,27 +79,20 @@ body {
 }
 
 .sidebar .menu .submenu a {
-    padding: 5px 20px;
+    padding: 5px 15px; /* 서브메뉴 항목 패딩 조정 */
 }
 
 .sidebar .menu .submenu a.active {
     color: #1c90f3;
 }
 
+/* 서브메뉴 토글 화살표 제거 */
 .has-submenu > a::after {
-    content: '▼';
-    font-size: 12px;
-    margin-left: auto;
-    transition: transform 0.3s;
-}
-
-.has-submenu.open > a::after {
-    transform: rotate(180deg);
+    content: none;
 }
 
 .content {
     flex-grow: 1;
-    padding: 20px;
     margin-left: 200px; /* 사이드바와 겹치지 않게 하기 위해 추가 */
     display: flex;
     flex-direction: column;
@@ -115,17 +108,19 @@ body {
     padding: 20px;
     background-color: #ffffff;
     border-bottom: 1px solid #e0e0e0;
-    margin-left: 20px;
 }
 
 .header-right {
     display: flex;
     align-items: center;
-    gap: 20px;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .profile-info {
     font-size: 16px;
+    margin-right: auto; /* 왼쪽 정렬을 위해 추가 */
+    padding: 0px 0px 0px 30px;
 }
 
 .logout {
@@ -147,7 +142,6 @@ body {
     background-color: #E71D36;
 }
 
-
 .main-content {
     flex-grow: 1;
     background-color: #ffffff;
@@ -157,7 +151,7 @@ body {
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    margin-left: 20px;
+    margin-left: 40px;
     overflow: hidden; /* Prevent overflow */
 }
 
@@ -176,48 +170,4 @@ body {
 
 .sidebar-toggle {
     display: none;
-    background-color: #2EC4B6;
-    color: white;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    z-index: 1001;
-}
-
-.sidebar.active {
-    transform: translateX(-100%);
-}
-
-@media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-    }
-
-    .sidebar.active {
-        transform: translateX(0);
-    }
-
-    .sidebar-toggle {
-        display: block;
-        background-color: #2EC4B6;
-        color: white;
-        border: none;
-        padding: 10px;
-        cursor: pointer;
-        z-index: 1001;
-        margin-right: auto; /* 왼쪽 정렬을 위한 속성 추가 */
-    }
-
-    .sidebar.active + .sidebar-toggle {
-        display: none; /* 사이드바가 열릴 때 탭 버튼 숨김 */
-    }
-
-    .content {
-        margin-left: 0;
-    }
-
-    .footer {
-        width: 100%;
-        left: 0;
-    }
-}
+    background-color: #2

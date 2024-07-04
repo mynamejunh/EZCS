@@ -17,13 +17,13 @@
             <ul class="menu">
                 <li><a href="{% url 'main:user_dashboard' %}"><span class="icon">🏠</span> 대시보드</a></li>
                 <li><a href="{% url 'counseling:list' %}"><span class="icon">💱</span> 상담</a></li>
-                <li class="has-submenu">
+                <li class="has-submenu {% if request.path == '/education/' %}active{% endif %}">
                     <a href="#"><span class="icon">📊</span> 교육</a>
                     <ul class="submenu">
-                        <li><a href="{% url 'education:chat_view' %}" class="active">롤플레잉</a></li>
-                        <li><a href="{% url 'education:quiz' %}">퀴즈</a></li>
-                        <li><a href="{% url 'education:edu_history' %}">교육 이력</a></li>
-                        <li><a href="{% url 'education:details' %}">교육 이력 상세(개발용)</a></li>
+                        <li><a href="{% url 'education:chat_view' %}" class="{% if request.path == '/education/' %}active{% endif %}">롤플레잉</a></li>
+                        <li><a href="{% url 'education:quiz' %}" class="{% if request.path == '/education/quiz/' %}active{% endif %}">퀴즈</a></li>
+                        <li><a href="{% url 'education:edu_history' %}" class="{% if request.path == '/education/edu_history/' %}active{% endif %}">교육 이력</a></li>
+                        <li><a href="{% url 'education:details' %}" class="{% if request.path == '/education/details/' %}active{% endif %}">교육 이력 상세(개발용)</a></li>
                     </ul>
                 </li>
             </ul>

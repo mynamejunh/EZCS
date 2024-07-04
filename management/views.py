@@ -5,9 +5,9 @@ from django.urls import reverse
 from django.db.models import Q
 
 #관리자 메인페이지 DB에서 정보 받아오는 부분
-def manager_dashboard(request):
+def dashboard(request):
     data = User.objects.all()
-    return render(request, 'management/manager_dashboard.html',{'data':data})
+    return render(request, 'management/dashboard.html',{'data':data})
 
 #상세페이지
 def manager_detail(request, id):

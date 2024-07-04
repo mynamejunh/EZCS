@@ -75,29 +75,39 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     
     phone_number = models.CharField(
+        null=True,
+        blank=True,
         max_length=20,
         verbose_name="User's Phone Number",
         db_comment="User's Phone Number"
     )
 
     address_code = models.IntegerField(
+        null=True,
+        blank=True,
         verbose_name="User's Address",
         db_comment="User's Address"
     )
     
     address = models.CharField(
+        null=True,
+        blank=True,
         max_length=255,
         verbose_name="User's Address",
         db_comment="User's Address"
     )
 
     address_detail = models.CharField(
+        null=True,
+        blank=True,
         max_length=255,
         verbose_name="User's Address",
         db_comment="User's Address"
     )
     
     department = models.CharField(
+        null=True,
+        blank=True,
         max_length=255,
         verbose_name="User's Department",
         db_comment="User's Department"

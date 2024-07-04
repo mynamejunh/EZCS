@@ -9,6 +9,9 @@ import logging
 def list(request):
     return render(request, 'counseling/index.html')
 
+def test(request):
+    return render(request, 'counseling/test.html')
+
 
 stt_model = STTModel(
     client_id=os.getenv('CLIENT_ID'),

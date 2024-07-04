@@ -25,7 +25,12 @@ class UserManager(BaseUserManager):
 
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
-        extra_fields['active_status'] = 1
+        
+        extra_fields.setdefault('active_status', True)
+
+        if extra_fields.get('active_status') is not True:
+            raise ValueError('Superuser must have active_status=True.')
+        
         return self.create_user(username, email, password, **extra_fields)
 
     def get_by_natural_key(self, username):

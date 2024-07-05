@@ -119,19 +119,19 @@
                 </thead>
                 <tbody>
                     {% if logs|length != 0 %}
-                        {% for log in logs %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ log.body }}</td>
-                            <td>{{ log.create_time }}</td>
-                            <td>{{ log.user_id }}</td>
-                        </tr>
-                        {% endfor %}
+                    {% for log in logs %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ log.body }}</td>
+                        <td>{{ log.create_time }}</td>
+                        <td>{{ log.user_id }}</td>
+                    </tr>
+                    {% endfor %}
 
-                        {% else %}
-                        <tr>
-                            <td colspan="4">교육 이력이 없습니다.</td>
-                        </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4">교육 이력이 없습니다.</td>
+                    </tr>
                     {% endif %}
                 </tbody>
             </table>

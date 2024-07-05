@@ -1,6 +1,7 @@
 function signup() {
     let username = $("#loginUsername").val();
     let name = $("#name").val();
+    let phone = $("#phone").val();
 
     if (containsKorean(username)) {
         $("#usernameError").text("아이디는 한글을 포함할 수 없습니다.");
@@ -69,6 +70,7 @@ function signup() {
         username: username,
         password: password,
         name: name,
+        phone_number: phone,
         email: fullEmail,
         birthdate: $("#birthdate").val(),
         addressCode: $("#addressCode").val(),
@@ -151,6 +153,32 @@ $(document).ready(function () {
                 }
             });
         });
+        
+        $("#phone").on("input", function () {
+            let phone = $(this).val();
+            let csrf = $("#signupForm").data("csrf");
+
+            $.ajax({
+                url: "/accounts/check-phone/",
+                type: "get",
+                data: { phone_number: phone },
+                dataType: "json",
+                headers: {
+                    "X-CSRFToken": csrf
+                },
+                success: function (data) {
+                    if (data.is_taken) {
+                        $("#phoneError").text("이미 가입된 전화번호입니다.");
+                        $("#phoneError").show();
+                        $("#phone").addClass("is-invalid");
+                    } else {
+                        $("#phoneError").hide();
+                        $("#phone").removeClass("is-invalid");
+                    }
+                }
+            });
+        });
+
     }
     $("#UserAdd2").on("input", function () {
         let addressDetail = $(this).val();

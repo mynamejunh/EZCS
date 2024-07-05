@@ -8,8 +8,11 @@ import logging
 from .models import CounselLog, CustomerInfo, User
 
 
+
 def list(request):
-    return render(request, "counseling/index.html")
+    data = CustomerInfo.objects.get(phone_number='01011112222')
+    print(data)
+    return render(request, "counseling/index.html",{'data':data})
 
 
 def test(request):
@@ -47,11 +50,8 @@ messages = "너는 친절하고 상냥하고 유능한 고객센터 상담원이
       예시: 네, 고객님 해당 문의 내용은 월사용요금을 kt에서 신용카드사로 청구하면 고객이 신용카드사에 결제대금을 납부하는 제도입니다."
 
 chatbot = Chatbot(
-    api_key=os.getenv("OPENAI_API_KEY"),
-    db_path="database/chroma.sqlite3",
-    model_id="ft:gpt-3.5-turbo-0125:personal::9gS63IJD",
-    behavior_policy=messages,
-)  # chatbot 객체 생성
+    os.getenv("OPENAI_API_KEY"), "database/chroma.sqlite3", behavior_policy=messages)  # chatbot 객체 생성
+
 
 
 # def stt_chat(request):
@@ -88,8 +88,10 @@ def stt_chat(request):
 
     if request.method == "POST":
         text = request.POST.get("text")
+
         username = request.POST.get("username")
         phone_number = request.POST.get("phone_number")
+
 
         if text:
                 print("#########################")

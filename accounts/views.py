@@ -10,7 +10,6 @@ from django.core.exceptions import ValidationError
 logger = logging.getLogger(__name__)
 
 def login_pass(request):
-    print("haha")
     username = request.POST.get('username', None)
     if username == "test":
         request.session['user'] = username
@@ -120,5 +119,10 @@ def check_username(request):
 def check_email(request):
     email = request.GET.get('email')
     is_taken = User.objects.filter(email=email).exists()
+    return JsonResponse({'is_taken': is_taken})
+
+def check_phone(request): 
+    phone_number = request.GET.get('phone_number')
+    is_taken = User.objects.filter(phone_number=phone_number).exists()
     return JsonResponse({'is_taken': is_taken})
 

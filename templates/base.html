@@ -40,8 +40,8 @@
         <div class="header">
             <button class="sidebar-toggle" id="sidebarToggle">☰</button>
             <div class="header-right">
-                {% if user %}
-                <div class="profile-info">{{ user }}님, 오늘 하루도 화이팅 하세요.</div>
+                {% if request.session.user %}
+                <div class="profile-info">{{ request.session.user }}님, 오늘 하루도 화이팅 하세요.</div>
                 <div class="logout">
                     <a href="{% url 'accounts:logout' %}">로그아웃</a>
                 </div>

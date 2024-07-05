@@ -136,11 +136,34 @@ body {
     align-self: flex-start;
 }
 
+
+.submit-container {
+    grid-column: 2 / 3;
+    justify-self: end;
+    align-self: start;
+    padding: 20px; /* 추가적인 패딩을 넣어 위치 조정 */
+}
+
+.submit-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.submit-button:hover {
+    background-color: #0056b3;
+}
+
+
 /* 반응형 디자인을 위한 미디어 쿼리 */
 @media (max-width: 768px) {
     .dashboard {
         grid-template-columns: 1fr;
-        grid-template-rows: repeat(4, 1fr); /* 각 행의 높이를 동일하게 설정 */
+        grid-template-rows: repeat(5, 1fr); /* 각 행의 높이를 동일하게 설정 */
         gap: 20px;
         height: auto; /* 화면 크기에 맞게 높이 조정 */
     }
@@ -151,6 +174,12 @@ body {
     .chat-section-readonly {
         grid-column: 1 / 2;
         grid-row: auto;
+    }
+
+    .submit-container {
+        grid-column: 1 / 2;
+        justify-self: center; /* 중앙에 배치 */
+        align-self: start; /* 상단에 배치 */
     }
 }
 

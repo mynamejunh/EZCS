@@ -16,11 +16,11 @@ from .models import CounselLog, CustomerInfo, User
 from django.http import HttpResponse
 
 def list(request):
-    try:
-        data = CustomerInfo.objects.get(phone_number='01011112222')
-    except CustomerInfo.DoesNotExist:
-        return HttpResponse("해당 전화번호를 가진 고객 정보를 찾을 수 없습니다.", status=404)
-    return render(request, 'counseling/index.html')
+    # data = CustomerInfo.objects.get(phone_number='01011112222')
+    # print(data)
+    # return render(request, "counseling/index.html", {'data':data})
+    return render(request, "counseling/index.html")
+
 
 def test(request):
     return render(request, "counseling/test.html")

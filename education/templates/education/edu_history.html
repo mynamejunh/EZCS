@@ -14,8 +14,11 @@
 </script>
 <link rel="stylesheet" href="{% static 'education/css/history.css' %}">
 
-<form method="GET" action="{% url 'education:edu_history' %}">
-    <div class="dashboard">
+
+<form action="" method="POST">
+    {% csrf_token %}
+    <div class="">
+
         <div>
             <h1>롤플레잉이력 이력(색 조합 고민중)</h1>
         </div>
@@ -32,7 +35,7 @@
                 <option value="pass">통과</option>
                 <option value="fail">실패</option>
             </select>
-            <button type="submit" class="btn btn-primary search-button">검색</button>
+            <input type="submit" class="btn btn-primary search-button" value="검색">
         </div>
         <div>
             <p>총 {{ logs.paginator.count }}건</p>
@@ -51,12 +54,13 @@
                 <tbody>
                     {% if logs %}
                     {% for log in logs %}
-                    <tr data-url="{% url 'education:edu_history' log.id %}">
+
+                    <tr data-url="{% url 'education:edu_details' log.id %}">
                         <td>{{ forloop.counter0|add:logs.start_index }}</td>
                         <td>{{ log.get_category_display }}</td>
                         <td>{{ log.is_passed|yesno:"통과,실패" }}</td>
                         <td>{{ log.create_time|date:"Y-m-d H:i" }}</td>
-                        <td>{{ log.user_id.username }}</td>
+
                     </tr>
                     {% endfor %}
                     {% else %}
@@ -70,8 +74,8 @@
         <div class="pagination">
             <div class="step-links">
                 {% if logs.has_previous %}
-                    <a href="?page=1">&laquo; 처음</a>
-                    <a href="?page={{ logs.previous_page_number }}">이전</a>
+                <a href="?page=1">&laquo; 처음</a>
+                <a href="?page={{ logs.previous_page_number }}">이전</a>
                 {% endif %}
 
                 <span class="current">
@@ -79,11 +83,12 @@
                 </span>
 
                 {% if logs.has_next %}
-                    <a href="?page={{ logs.next_page_number }}">다음</a>
-                    <a href="?page={{ logs.paginator.num_pages }}">마지막 &raquo;</a>
+                <a href="?page={{ logs.next_page_number }}">다음</a>
+                <a href="?page={{ logs.paginator.num_pages }}">마지막 &raquo;</a>
                 {% endif %}
             </div>
         </div>
     </div>
 </form>
+
 {% endblock %}

@@ -198,3 +198,14 @@ def chat_view(request):
             return JsonResponse({'response': output})
 
     return render(request, 'education/index.html')
+
+#검색로직
+def search(request):
+    query = request.POST.get('searchText', '')
+   
+    if query:
+        results = User.objects.filter(name__icontains=query)
+    else:
+        results = []
+    return render(request, 'education/edu_history.html', {'data': results, 'query': query})
+

@@ -22,7 +22,8 @@ function ResetPW() {
 
     let form = $("#searchPWForm");
     let url = form.data("url");
-    let csrf = $("input[name=csrf]").val();
+    let csrf = $("input[name=csrfmiddlewaretoken]").val();
+
 
     $.ajax({
         url: url,
@@ -35,7 +36,7 @@ function ResetPW() {
         success: function (response) {
             if (response.result === 'success') {
                 alert(response.msg);
-                window.open("{% url 'accounts:reset_password' %}", "Reset PassWord", "width=" + width + ",height=" + height + ",top=" + top + ",left=" + left);
+                window.location.href = "/accounts/reset_password/";
             } else {
                 alert(response.msg);
             }

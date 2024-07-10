@@ -5,27 +5,37 @@ from stt import STTModel
 from chat import Chatbot
 from django.views.decorators.csrf import csrf_exempt
 import logging
-from .models import CounselLog, CustomerInfo, User
+from .models import *
 import json
-
+from django.http import HttpResponse
 
 # def list(request):
 #     data = CustomerInfo.objects.get(phone_number='01011112222')
 #     print(data)
 #     return render(request, "counseling/index.html",{'data':data})
 
-from django.http import HttpResponse
-
 
 def list(request):
-    data = ''
-    print(data)
-    return render(request, "counseling/index.html",{'data':data})
+    if request.user.is_authenticated:
+        # 유저 세션 정보를 템플릿으로 전달
+        username = request.user.username
+    else:
+        username = None
+    print(username)
+    
+    return render(request, "counseling/index.html",{'username':username})
 
 
+# 상담이력 뷰
+def history(request):
+    query = request.POST.get('searchText', '')
 
-def test(request):
-    return render(request, "counseling/test.html")
+    if query:
+        logs = CounselLog.objects.filter(body__icontains=query)
+    else:
+        logs = CounselLog.objects.all()
+
+    return render(request, 'counseling/history.html', {'logs': logs})
 
 
 stt_model = STTModel(
@@ -57,6 +67,7 @@ def stt(request):
 messages = "너는 친절하고 상냥하고 유능한 고객센터 상담원이야. \
       고객의 질문에 대해 고객센터 매뉴얼을 참고해서 완벽한 답변 대본을 작성해줘.\
       예시: 네, 고객님 해당 문의 내용은 월사용요금을 kt에서 신용카드사로 청구하면 고객이 신용카드사에 결제대금을 납부하는 제도입니다."
+
 
 chatbot = Chatbot(
     os.getenv("OPENAI_API_KEY"), "database/chroma.sqlite3", behavior_policy=messages
@@ -97,28 +108,13 @@ def stt_chat(request):
 
     if request.method == "POST":
         text = request.POST.get("text")
-        username = request.POST.get("username")
-        phone_number = request.POST.get("phone_number")
-        print(text)
-
 
         if text:
             print("#########################")
             print("text", text)
-            print("username", username)
-            print("phone_number", phone_number)
             print("#########################")
 
             output = chatbot.chat(text)
-            # customer_info = CustomerInfo.objects.get(phone_number=phone_number)
-            # print(customer_info)
-
-            # counselLog_instance = CounselLog(
-            #     username=username,
-            #     body={"prompt": text, "output": output},
-            #     phone_number=customer_info,
-            # )
-            # counselLog_instance.save()
 
             return JsonResponse({"text": text, "output": output})
 

@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-import os
 from chat import Chatbot
 from django.views.decorators.csrf import csrf_exempt
 import logging
@@ -10,23 +9,24 @@ import json
 from django.core.paginator import Paginator
 from django.http import HttpResponse
 import random
-# def list(request):
-#     data = CustomerInfo.objects.get(phone_number='01011112222')
-#     print(data)
-#     return render(request, "counseling/index.html",{'data':data})
 
-def list(request):
-    customer_info_queryset = CustomerInfo.objects.all()
 
-    if customer_info_queryset.exists():
-        # 랜덤으로 고객 정보 중 하나를 선택
-        random_customer = random.choice(customer_info_queryset)
+logger = logging.getLogger(__name__)
+
+
+def counsel(request):
+    """
+    상담 페이지
+    """
+    customer = CustomerProfile.objects.order_by('?').first()
+
+    if customer:
         # 선택된 고객의 상담 기록을 모두 가져오기
-        counsel_logs_queryset = CounselLog.objects.filter(phone_number=random_customer.phone_number)
+        log = Log.objects.filter(customer=customer)
 
-        if counsel_logs_queryset.exists():
+        if log:
             # 랜덤으로 상담 기록 중 하나를 선택
-            random_counsel_log = random.choice(counsel_logs_queryset)
+            random_counsel_log = random.choice(log)
 
             try:
                 if isinstance(random_counsel_log.memo, str):
@@ -43,31 +43,74 @@ def list(request):
                 random_counsel_log.action_text = ''
 
             context = {
-                'customer_info': [random_customer],  # 리스트로 전달
-                'counsel_logs': [random_counsel_log]  # 리스트로 전달
+                'customer': customer
+                , 'counsel_logs': [random_counsel_log]  # 리스트로 전달
             }
         else:
             # 상담 기록이 없는 경우 빈 리스트 전달
             context = {
-                'customer_info': [random_customer],  # 리스트로 전달
-                'counsel_logs': []
+                'customer': customer
+                , 'counsel_logs': []
             }
     else:
         # 고객 정보가 없는 경우 빈 리스트 전달
         context = {
-            'customer_info': [],
+            'customer_info': None,
             'counsel_logs': []
         }
 
     return render(request, "counseling/index.html", context)
+
+
+def save_customer_info(request):
+    """
+    고객 정보 수정
+    """
+    if request.method == "POST":
+        customer_id = request.POST.get("customer-id")
+        customer_name = request.POST.get("customer-name")
+        birth_date = request.POST.get("birthdate")
+        phone_number = request.POST.get("phone")
+        address = request.POST.get("address")
+        joined_date = request.POST.get("join-date")
+
+        print(customer_id)
+        print(customer_name)
+        print(birth_date)
+        print(phone_number)
+        print(address)
+        print(joined_date)
+
+        try:
+            customer = CustomerProfile.objects.get(id=customer_id)
+            # Update the attributes
+            customer.phone_number = phone_number
+            customer.customer_name = customer_name
+            customer.birth_date = birth_date
+            customer.joined_date = joined_date
+            customer.address = address
+            customer.save()
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+
+
+
+
+
+
 # 상담이력 뷰
 def history(request):
     query = request.POST.get('searchText', '')
 
     if query:
-        logs = CounselLog.objects.filter(body__icontains=query)
+        logs = Log.objects.filter(body__icontains=query)
     else:
-        logs = CounselLog.objects.all()
+        logs = Log.objects.all()
 
     # 검색 필터링 처리
     search_text = request.GET.get("searchText", "")
@@ -101,38 +144,6 @@ def history(request):
     )
 
 @csrf_exempt
-def save_customer_info(request):
-    if request.method == "POST":
-        customer_name = request.POST.get("customer-name")
-        birth_date = request.POST.get("birthdate")
-        phone_number = request.POST.get("phone")
-        address = request.POST.get("address")
-        joined_date = request.POST.get("join-date")
-
-        print(customer_name)
-        print(birth_date)
-        print(phone_number)
-        print(address)
-        print(joined_date)
-
-        try:
-            customer_info = CustomerInfo(
-                phone_number=phone_number,
-                name=customer_name,
-                birth_date=birth_date,
-                joined_date=joined_date,
-                address=address,
-            )
-            customer_info.save()
-
-            return JsonResponse({"success": True})
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
-
-
-@csrf_exempt
 def save_counseling_log(request):
     if request.method == "POST":
         try:
@@ -142,9 +153,9 @@ def save_counseling_log(request):
             phone_number_str = data.get("phone_number")
 
             try:
-                phone_number = CustomerInfo.objects.get(phone_number=phone_number_str)
-            except CustomerInfo.DoesNotExist:
-                return JsonResponse({"success": False, "error": "CustomerInfo not found"})
+                phone_number = CustomerProfile.objects.get(phone_number=phone_number_str)
+            except CustomerProfile.DoesNotExist:
+                return JsonResponse({"success": False, "error": "CustomerProfile not found"})
 
             chat_data = json.dumps(data.get("chat_data", {}), ensure_ascii=False)
             memo_data = json.dumps(data.get("memo_data", {}), ensure_ascii=False)
@@ -154,7 +165,7 @@ def save_counseling_log(request):
             print(f"Chat Data: {chat_data}")
             print(f"Memo Data: {memo_data}")
 
-            counselLog = CounselLog(
+            counselLog = Log(
                 username=username,
                 phone_number=phone_number,
                 body=chat_data,
@@ -178,7 +189,7 @@ def save_consultation(request):
             action_text = request.POST.get('action_text')
 
             if log_id and (inquiry_text or action_text):
-                counsel_log = CounselLog.objects.get(id=log_id)
+                counsel_log = Log.objects.get(id=log_id)
                 memo = json.loads(counsel_log.memo) if isinstance(counsel_log.memo, str) else counsel_log.memo or {}
                 memo['inquiry_text'] = inquiry_text
                 memo['action_text'] = action_text

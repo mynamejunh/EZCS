@@ -112,8 +112,42 @@ def chat_view(request):
 
 
 
+def edu_history(request):
+    '''
+    교육 이력 페이지
+    '''
+    logs = EducationChatbotLog.objects.all()
 
+    # 검색 필터링 처리
+    search_text = request.GET.get("searchText", "")
+    category = request.GET.get("category", "")
+    result = request.GET.get("result", "")
 
+    if search_text:
+        logs = logs.filter(
+            Q(user_id__username__icontains=search_text)
+            | Q(user_id__name__icontains=search_text)
+        )
+
+    if category:
+        logs = logs.filter(category=category)
+
+    if result:
+        if result == "pass":
+            logs = logs.filter(is_passed=True)
+        elif result == "fail":
+            logs = logs.filter(is_passed=False)
+
+    # 페이지네이션 처리
+    paginator = Paginator(logs, 10)  # 페이지당 10개씩 표시
+    page = request.GET.get("page")
+    logs = paginator.get_page(page)
+
+    return render(
+        request,
+        "education/edu_history.html",
+        {"logs": logs, "is_paginated": logs.has_other_pages()},
+    )
 
 @csrf_exempt
 def evaluation_chat(request):
@@ -148,14 +182,6 @@ def evaluation_chat(request):
             return JsonResponse({"userInput": userInput, "output": output})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
-
-
-def edu_history(request):
-    '''
-    교육 이력 페이지
-    '''
-    logs = Log.objects.all()
-    return render(request, 'education/edu_history.html', {'logs': logs})
 
 
 def edu_details(request):

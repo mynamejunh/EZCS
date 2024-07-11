@@ -116,7 +116,7 @@ def edu_history(request):
     '''
     교육 이력 페이지
     '''
-    logs = EducationChatbotLog.objects.all()
+    logs = Log.objects.all()
 
     # 검색 필터링 처리
     search_text = request.GET.get("searchText", "")

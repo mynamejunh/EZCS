@@ -160,10 +160,6 @@ def edu_details(request, id):
     '''
     교육 이력 상세 페이지
     '''
-    print("haha")
-    print("haha")
-    print("haha")
-    print("haha")
     head = Log.objects.get(id=id)
     data = LogItem.objects.filter(log_id=id)
     context = {
@@ -312,8 +308,11 @@ def quiz_details(request, log_id):
     '''
     퀴즈 이력 상세
     '''
-    log = get_object_or_404(QuizHistory, id=log_id)
+    head = get_object_or_404(QuizHistory, id=log_id)
 
-    items = QuizHistoryItem.objects.filter(quiz_history=log_id).select_related('education_quiz_id')
-    
-    return render(request, 'education/quiz_details.html', {'log': log, 'items' : items})
+    data = QuizHistoryItem.objects.filter(quiz_history=log_id).select_related('quiz')
+    context = {
+        'head': head
+        , 'data': data
+    }
+    return render(request, 'education/quiz_details.html', context)

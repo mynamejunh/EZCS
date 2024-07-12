@@ -7,17 +7,193 @@ from .models import *
 from django.db.models import Q
 import json
 from django.core.paginator import Paginator
-from django.http import HttpResponse
 import random
+from django.conf import settings
+from datetime import datetime, timedelta
 
 
 logger = logging.getLogger(__name__)
 
+trans_chat_bot = None
+recommend_chat_bot = None 
 
 def counsel(request):
     """
     상담 페이지
     """
+    if request.method == 'POST':
+        global trans_chat_bot, recommend_chat_bot
+        id = request.POST.get('customerId')
+        customer = CustomerProfile.objects.get(id=id)
+        log = Log.objects.create(
+            auth_user_id = request.user.id
+            , customer_id = id
+        )
+        context = {
+            'logId': log.id
+            , 'customer': customer
+        }
+        trans_chat_bot = Chatbot(
+            api_key=settings.OPENAI_API_KEY,
+            db_path=settings.DB_PATH,
+            model_id='ft:gpt-3.5-turbo-0125:personal::9god26fK',
+            behavior_policy=None,
+        )
+        
+        messages = "너는 친절하고 상냥하고 유능한 고객센터 상담원이야. \
+        고객의 질문에 대해 고객센터 매뉴얼을 참고해서 완벽한 답변 대본을 작성해줘.\
+        예시: 네, 고객님 해당 문의 내용은 월사용요금을 kt에서 신용카드사로 청구하면 고객이 신용카드사에 결제대금을 납부하는 제도입니다."
+
+        recommend_chat_bot = Chatbot(
+            api_key=settings.OPENAI_API_KEY,
+            db_path=settings.DB_PATH,
+            behavior_policy=messages
+        )
+        
+        return render(request, "counseling/index.html", context)
+    
+    customer = CustomerProfile.objects.order_by('?').first()
+    context = {'customer': customer}
+    return render(request, "counseling/index.html", context)
+
+
+def update_log(request):
+    """
+    고객 정보 수정
+    """
+    if request.method == "POST":
+        customer_id = request.POST.get("customer-id")
+        customer_name = request.POST.get("customer-name")
+        birth_date = request.POST.get("birthdate")
+        phone_number = request.POST.get("phone")
+        address = request.POST.get("address")
+        joined_date = request.POST.get("join-date")
+        log_id = request.POST.get("logId")
+        inquiries = request.POST.get("inquiries")
+        action = request.POST.get("action")
+
+        try:
+            customer = CustomerProfile.objects.get(id=customer_id)
+            customer.phone_number = phone_number
+            customer.customer_name = customer_name
+            customer.birth_date = birth_date
+            customer.joined_date = joined_date
+            customer.address = address
+            customer.save()
+            log = Log.objects.get(id=log_id)
+            log.inquiries = inquiries
+            log.action = action
+            log.save()
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+def ai_model(request):
+    if request.method == "POST":
+        classify = request.POST.get("classify")
+        message = request.POST.get("message")
+        log_id = request.POST.get("logId")
+        try:
+            classify = 0 if classify == 'customer' else 1
+            columns = {
+                "classify": classify
+                , "message": message
+                , "log_id": log_id
+            }
+            result = {
+                "success": True
+            }
+            if not classify:
+                global trans_chat_bot, recommend_chat_bot
+                trans_output = trans_chat_bot.chat(message)
+                recommend_output = recommend_chat_bot.chat(message)
+                columns['recommend'] = recommend_output
+                columns['translate'] = trans_output
+                result['recommend_output'] = recommend_output
+                result['trans_output'] = trans_output
+
+            LogItem.objects.create(**columns)
+            
+            return JsonResponse(result)
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+def history(request):
+    """
+    상담 이력 페이지
+    """
+    search_text = request.GET.get("searchText", "")
+    search_select = request.GET.get("searchSelect", "")
+    
+    start_date = request.GET.get("startDate", "")
+    end_date = request.GET.get("endDate", "")
+
+    query = Q()
+    if not request.user.is_superuser:
+        query = Q(auth_user=request.user.id)
+    
+    query1 = Q()
+    if search_text:
+        query1 = Q(customer__name__icontains=search_text)
+
+    query2 = Q()
+    if start_date and end_date:
+        query2 &= Q(create_time__gte=start_date)
+        query2 &= Q(create_time__lte=end_date)
+    else:
+        one_month_ago = datetime.now() - timedelta(days=30)
+        query2 &= Q(create_time__gte=one_month_ago)
+        query2 &= Q(create_time__lte=datetime.now())
+        start_date = one_month_ago.strftime('%Y-%m-%d')
+        end_date = datetime.now().strftime('%Y-%m-%d')
+
+    data = Log.objects.filter(query & query1 & query2).order_by('-create_time', 'customer_id', 'auth_user_id')
+
+    paginator = Paginator(data, 10)
+    page = request.GET.get('page')
+    data = paginator.get_page(page)
+
+    context = {
+        'data': data,
+        'searchSelect': search_select,
+        'searchText': search_text,
+        'startDate': start_date,
+        'endDate': end_date,
+        'is_paginated': data.has_other_pages(),
+    }
+    return render(request, "counseling/history.html", context)
+
+def detail(request, id):
+    head = Log.objects.get(id=id)
+    data = LogItem.objects.filter(log_id=id)
+    context = {
+        'head': head
+        , 'data': data
+    }
+    return render(request, "counseling/detail.html", context)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def list(request):
     customer = CustomerProfile.objects.order_by('?').first()
 
     if customer:
@@ -60,88 +236,6 @@ def counsel(request):
         }
 
     return render(request, "counseling/index.html", context)
-
-
-def save_customer_info(request):
-    """
-    고객 정보 수정
-    """
-    if request.method == "POST":
-        customer_id = request.POST.get("customer-id")
-        customer_name = request.POST.get("customer-name")
-        birth_date = request.POST.get("birthdate")
-        phone_number = request.POST.get("phone")
-        address = request.POST.get("address")
-        joined_date = request.POST.get("join-date")
-
-        print(customer_id)
-        print(customer_name)
-        print(birth_date)
-        print(phone_number)
-        print(address)
-        print(joined_date)
-
-        try:
-            customer = CustomerProfile.objects.get(id=customer_id)
-            # Update the attributes
-            customer.phone_number = phone_number
-            customer.customer_name = customer_name
-            customer.birth_date = birth_date
-            customer.joined_date = joined_date
-            customer.address = address
-            customer.save()
-            return JsonResponse({"success": True})
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
-
-
-
-
-
-
-
-
-# 상담이력 뷰
-def history(request):
-    query = request.POST.get('searchText', '')
-
-    if query:
-        logs = Log.objects.filter(body__icontains=query)
-    else:
-        logs = Log.objects.all()
-
-    # 검색 필터링 처리
-    search_text = request.GET.get("searchText", "")
-    category = request.GET.get("category", "")
-    result = request.GET.get("result", "")
-
-    if search_text:
-        logs = logs.filter(
-            Q(user_id__username__icontains=search_text)
-            | Q(user_id__name__icontains=search_text)
-        )
-
-    if category:
-        logs = logs.filter(category=category)
-
-    if result:
-        if result == "pass":
-            logs = logs.filter(is_passed=True)
-        elif result == "fail":
-            logs = logs.filter(is_passed=False)
-
-    # 페이지네이션 처리
-    paginator = Paginator(logs, 10)  # 페이지당 10개씩 표시
-    page = request.GET.get("page")
-    logs = paginator.get_page(page)
-
-    return render(
-        request,
-        "counseling/history.html",
-        {"logs": logs, "is_paginated": logs.has_other_pages()},
-    )
 
 @csrf_exempt
 def save_counseling_log(request):

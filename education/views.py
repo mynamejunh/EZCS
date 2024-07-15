@@ -8,7 +8,7 @@ from .forms import QuizForm
 from django.core.paginator import Paginator
 from django.conf import settings
 from django.db.models import Q
-from django.http import JsonResponse
+from django.http import JsonResponse, StreamingHttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 
@@ -43,9 +43,7 @@ def chat_view(request):
             # 사용자 메시지에 대한 응답 생성
             output = chatbot.chat(message)
 
-            message = prompt.get_messages_for_evaluation(output, message)
-
-            evaluation_output = chatbot.chat(message)
+            evaluation_output = chatbot.chat(prompt.get_messages_for_evaluation(output, message))
 
             LogItem.objects.create(
                 chatbot=output
@@ -53,7 +51,28 @@ def chat_view(request):
                 , evaluate=evaluation_output
                 , log_id=log_header_id
             )
-
+            """
+            def generate_response():
+                stream = openai.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=[
+                        {
+                            "role": "system", 
+                            "content": system_prompt
+                        },
+                        {
+                            "role": "user",
+                            "content": prompt
+                        }
+                    ],
+                    stream=True,
+                )
+                for chunk in stream:
+                    if chunk.choices[0].delta.content is not None:
+                        content = chunk.choices[0].delta.content
+                        print(content)
+                        yield content
+            """
             return JsonResponse({
                 "response": output
                 , "userInput": message

@@ -76,7 +76,6 @@
                 </thead>
                 <tbody>
                     {% if data %}
-                    {}
                     {% for item in data %}
                     <tr data-url="{% url 'management:detail' item.id flag %}" class="active-row">
                         <td>{{ forloop.counter }}</td>

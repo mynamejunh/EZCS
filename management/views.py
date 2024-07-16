@@ -5,6 +5,8 @@ from django.core.paginator import Paginator
 from datetime import datetime, timedelta
 from .models import Board
 from django.core.exceptions import ValidationError
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 
 def validate_image(file):
     valid_mime_types = ['image/jpeg', 'image/png']
@@ -164,6 +166,77 @@ def edit(request, id, flag):
         user.active_status = request.POST.get('active_status')
         user.save()
         return redirect("management:detail", id, flag)
+
+@csrf_exempt
+def adminsignup(request):
+    if request.method == 'GET':
+        return render(request, 'management/adminsignup.html')
+    elif request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        name = request.POST.get('name')
+        phone_number = request.POST.get('phone_number')
+        email = request.POST.get('email')
+        birth_date = request.POST.get('birthdate')
+        address_code = request.POST.get('addressCode')
+        address = request.POST.get('address')
+        address_detail = request.POST.get('addressDetail')
+        department = request.POST.get('department')
+        
+        user = User.objects.create_user(
+            username = username,
+            password = password,
+            first_name = name,
+            email = email,
+            is_superuser = 1,
+        )
+        
+        AdministratorProfile.objects.create(
+            auth_user=User.objects.get(id=user.id)
+            , birth_date=birth_date
+            , phone_number=phone_number
+            , address_code=address_code
+            , address=address
+            , address_detail=address_detail
+            , department=department
+        )
+
+        result = True
+        msg = "회원가입 요청이 완료되었습니다."
+
+        return JsonResponse({'result': result, 'msg': msg})
+
+@csrf_exempt
+def admincheck_username(request):
+    username = request.POST.get('username')
+    is_taken = User.objects.filter(username=username).exists()
+    print(is_taken)
+    return JsonResponse({'is_taken': is_taken})
+
+def admincheck_email(request):
+    email = request.GET.get('email')
+    is_taken = User.objects.filter(email=email).exists()
+    return JsonResponse({'is_taken': is_taken})
+
+def admincheck_phone(request): 
+    phone_number = request.GET.get('phone_number')
+    is_taken = CounselorProfile.objects.filter(phone_number=phone_number).exists()
+    return JsonResponse({'is_taken': is_taken})
+
+def adminreset_password(request):
+    if request.method == 'POST':
+        new_password = request.POST.get('new_password')
+        user_id = request.session.get('reset_user_id')
+
+        try:
+            user = User.objects.get(id=user_id)
+            user.set_password(new_password)
+            user.save()
+            del request.session['reset_user_id']
+            return JsonResponse({'result': 'success', 'msg': '비밀번호가 성공적으로 변경되었습니다.'})
+        except User.DoesNotExist:
+            return JsonResponse({'result': 'error', 'msg': '사용자를 찾을 수 없습니다.'})
+    return render(request, 'accounts/reset_password.html')
 
 
 

@@ -8,6 +8,11 @@ urlpatterns = [
     path('detail/<int:id>/<str:flag>/', views.detail, name='detail'),
     path('update_auth/<int:id>/<int:status>', views.update_auth, name='update_auth'),
     path('edit/<int:id>/<str:flag>/', views.edit, name='edit'),
+    path('adminsignup', views.adminsignup, name='adminsignup'),
+    path('admincheck-username/', views.admincheck_username, name='admincheck-username'),
+    path('admincheck-email/', views.admincheck_email, name='admincheck-email'),
+    path('admincheck-phone/', views.admincheck_phone, name='admincheck-phone'), 
+    path('adminreset_password/', views.adminreset_password, name='adminreset-password'),
 
 
 

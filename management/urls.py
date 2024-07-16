@@ -30,4 +30,9 @@ urlpatterns = [
     path('search/', views.search, name='search'), #검색기능
     path('allow_search/', views.allow_search, name='allow_search'), #검색기능
     path('inactive_search/', views.inactive_search, name='inactive_search'), #검색기능
+
+
+    path('list/board/', views.list, {'flag': 'board'}, name='board_list'),  # 공지사항 목록
+    path('list/board/create/', views.board_create, name='board_create'),  # 공지사항 작성
+    path('list/board/<int:id>/', views.board_detail, name='board_detail'),  # 공지사항 상세보기
 ]

@@ -3,29 +3,37 @@ from accounts.models import *
 from django.db.models import Q
 from django.core.paginator import Paginator
 from datetime import datetime, timedelta
+from .models import Board
+from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 
+def validate_image(file):
+    valid_mime_types = ['image/jpeg', 'image/png']
+    if file.content_type not in valid_mime_types:
+        raise ValidationError('jpg, jpeg, and png 파일만 업로드 가능합니다.')
 
+    
 def list(request, flag):
-    """
-    관리자 메인페이지 DB에서 정보 받아오는 부분
-    """
     search_select = request.GET.get("searchSelect", "")
     search_text = request.GET.get("searchText", "")
-
     start_date = request.GET.get("startDate", "")
     end_date = request.GET.get("endDate", "")
-
     query = Q()
+
     if flag == 'm':
         query &= Q(auth_user__is_superuser=False)
         query &= Q(active_status=1)
     elif flag == 'ad':
         query &= Q(auth_user__is_superuser=True)
+    elif flag == 'board':
+        boards = Board.objects.all()
+        context = {'boards': boards}
+        return render(request, 'management/board_list.html', context)
     else:
         query &= Q(auth_user__is_superuser=False)
         query &= Q(active_status=0)
+    
     query1 = Q()
     if search_select:
         valid_fields = {
@@ -36,7 +44,6 @@ def list(request, flag):
 
         if search_select == 'all':
             for val in valid_fields.values():
-                print(val)
                 query1 |= Q(**{val: search_text})
         else:
             search_field = valid_fields[search_select]
@@ -60,6 +67,7 @@ def list(request, flag):
         data = AdministratorProfile.objects.filter(query & query1 & query2)
     else:
         data = CounselorProfile.objects.filter(query & query1 & query2)
+    
     paginator = Paginator(data, 10)
     page = request.GET.get('page')
     data = paginator.get_page(page)
@@ -76,6 +84,40 @@ def list(request, flag):
 
     return render(request, 'management/list.html', context)
 
+def board_create(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        body = request.POST.get('body')
+        flag = request.POST.get('flag', 0)  # 기본값으로 활성화 상태 설정
+
+        # 파일 형식 검증
+        if 'file' in request.FILES:
+            file = request.FILES['file']
+            file_extension = file.name.split('.')[-1].lower()
+            if file_extension not in ['jpg', 'jpeg', 'png']:
+                return render(request, 'management/board_create.html', {'error': '파일 형식이 유효하지 않습니다. jpg, jpeg, png 형식만 업로드 가능합니다.'})
+
+        board = Board.objects.create(
+            auth_user=request.user,
+            title=title,
+            body=body,
+            flag=flag
+        )
+
+        if 'file' in request.FILES:
+            board.file = request.FILES['file']
+            board.save()
+
+        return redirect('management:board_list')  # 공지사항 목록 페이지로 리디렉션
+    return render(request, 'management/board_create.html')
+
+def board_list(request):
+    boards = Board.objects.all()
+    return render(request, 'management/board_list.html', {'boards': boards})
+
+def board_detail(request, id):
+    board = get_object_or_404(Board, id=id)
+    return render(request, 'management/board_detail.html', {'board': board})
 
 def detail(request, id, flag):
     """
@@ -388,4 +430,3 @@ def inactive_search(request):
     else:
         results = []
     return render(request, 'management/manager_dashboard.html', {'data': results, 'query': query})
-         

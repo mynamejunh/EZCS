@@ -44,6 +44,9 @@ def list(request, flag):
 
     query2 = Q()
     if start_date and end_date:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        end_date = datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1) - timedelta(seconds=1)
+        
         query2 &= Q(auth_user__date_joined__gte=start_date)
         query2 &= Q(auth_user__date_joined__lte=end_date)
     else:

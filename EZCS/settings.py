@@ -174,3 +174,6 @@ SESSION_SAVE_EVERY_REQUEST = True
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 
 DB_PATH = "../db"
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

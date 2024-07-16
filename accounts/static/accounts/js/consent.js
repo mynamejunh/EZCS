@@ -2,7 +2,8 @@ $(document).ready(function () {
     const form = $('#consentForm');
     const checkAll = $('#checkAll');
     const checkBoxes = $('input[name="agreement"]');
-    const submitButton = $('input[type="submit"]');
+    const submitButton = $('input[type="button"]');
+
 
     const agreements = {
         termsOfService: false,
@@ -28,7 +29,16 @@ $(document).ready(function () {
     }
 
     function toggleSubmitButton() {
-        submitButton.prop('disabled', !agreements.termsOfService || !agreements.privacyPolicy);
+        var submitButton = $('#submitButton');
+        if (!agreements.termsOfService || !agreements.privacyPolicy) {
+            submitButton.prop('disabled', true);
+            submitButton.css('background-color', '#fff');
+            submitButton.css('color', '#007bff');
+        } else if (agreements.termsOfService || agreements.privacyPolicy) {
+            submitButton.prop('disabled', false);
+            submitButton.css('background-color', '#007bff');
+            submitButton.css('color', '#fff');
+        }
     }
 
     checkAll.on('change', function () {
@@ -41,3 +51,19 @@ $(document).ready(function () {
         toggleSubmitButton();
     });
 });
+
+function test(url) {
+    // if (!$("#termsOfService").is(":checked")) {
+    //     alert("이용약관 동의는 필수입니다.");
+    //     return false;
+    // } else if (!$("#privacyPolicy").is(":checked")) {
+    //     alert("개인정보 수집 및 이용 동의는 필수입니다.");
+    //     return false;
+    // }
+    if (!$("#termsOfService").is(":checked") ||!$("#privacyPolicy").is(":checked") ) {
+        alert("개인정보 수집 및 이용과 이용약관 동의는 필수입니다.");
+        return false;
+    }
+    location.href = url
+}
+

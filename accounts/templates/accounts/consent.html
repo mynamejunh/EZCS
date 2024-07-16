@@ -7,8 +7,8 @@
 <div class="container">
   <div class="input-form-backgroud row">
     <div class="input-form" style="padding: 25px; width: 119%; transform: translate(-10%, 0%);">
-      <form action="{% url 'accounts:signup' %}" method="POST" id="consentForm">
-        {% csrf_token %}
+      <form action="{% url 'accounts:signup' %}" method="GET" id="consentForm">
+
         <div class="input_check_all" style="margin-bottom: 15px;">
           <input type="checkbox" name="checkAll" id="checkAll">
           <label for="checkAll">
@@ -55,7 +55,7 @@
           동의를 받습니다.
         </div>
         <div>
-          <input type="submit" value="확인" class="btn btn-outline-primary" style="width: -webkit-fill-available;">
+          <input type="button" id="submitButton" value="확인" class="btn btn-outline-primary" style="width: -webkit-fill-available;" onclick="test('{% url "accounts:signup" %}');">
         </div>
       </form>
     </div>

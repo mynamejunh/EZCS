@@ -1,0 +1,115 @@
+/* body가 적용이 안되서 어쩔 수 없이 html에서 load */
+/* body {
+    font-family: 'GmarketSansMedium', Arial, sans-serif !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+} */
+img.ezcs-logo {
+    position: relative;
+    width: 200px;
+    height: auto;
+    top: 0%;
+    left: 50%;
+    padding: 20px;
+    transform: translate(-50%, 0%);
+}
+@media (max-width: 768px) {
+    .ezcs-logo {
+        width: 70px;
+    }
+    .logo-container {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ezcs-logo {
+        width: 50px;
+    }
+    .logo-container {
+        padding: 10px;
+    }
+}
+
+.my-form {
+    width: 100% !important;
+}
+.username-input {
+    display: flex;
+    align-items: center;
+}
+
+.container-fluid {
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.input-form-backgroud {
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 500px;
+    width: 100%;
+}
+
+
+h2 {
+    text-align: center;
+    color: #333;
+    margin: 20px;
+}
+
+.form-floating {
+    margin-bottom: 15px;
+}
+
+
+.btn-outline-primary {
+    color: #007bff;
+    border-color: #007bff;
+    width: 5cm;
+}
+
+.btn-outline-primary:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+p {
+    text-align: center;
+    margin-top: 20px;
+}
+
+p a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+p a:hover {
+    text-decoration: underline;
+}
+
+.form-check-input {
+    margin-right: 10px;
+}
+
+.my_container {
+    max-width: 400px;
+    text-align: center;
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}

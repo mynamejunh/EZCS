@@ -94,6 +94,16 @@ DATABASES = {
         'PORT': '3306',
     }
 }
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'ezcs',
+#         'USER': os.environ['MySQL_ID'],
+#         'PASSWORD': os.environ['MySQL_PW'],
+#         'HOST': 'database-2.cf6gigmokj2d.ap-northeast-2.rds.amazonaws.com',
+#         'PORT': '3306',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

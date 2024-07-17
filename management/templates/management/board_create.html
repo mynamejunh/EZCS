@@ -1,4 +1,5 @@
 {% extends 'base_manager.html' %}
+
 {% block title %}공지 사항 작성{% endblock %}
 
 {% block content %}
@@ -53,6 +54,7 @@
     var quill = new Quill('#editor-container', {
         theme: 'snow'
     });
+
 
     document.querySelector('form').onsubmit = function () {
         var body = document.querySelector('input[name=body]');

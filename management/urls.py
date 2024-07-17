@@ -35,4 +35,6 @@ urlpatterns = [
     path('list/board/', views.list, {'flag': 'board'}, name='board_list'),  # 공지사항 목록
     path('list/board/create/', views.board_create, name='board_create'),  # 공지사항 작성
     path('list/board/<int:id>/', views.board_detail, name='board_detail'),  # 공지사항 상세보기
+    path('list/board/<int:id>/delete/', views.board_delete, name='board_delete'),  # 삭제 URL 추가
+
 ]

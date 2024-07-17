@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}퀴즈 이력{% endblock %}
 
 {% block content %}
 {% load static %}
@@ -51,7 +51,9 @@
                         <th>카테고리</th>
                         <th>결과</th>
                         <th>날짜</th>
+                        {% if request.user.is_superuser %}
                         <th>사용자</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -62,12 +64,14 @@
                         <td>{{ item.get_category_display }}</td>
                         <td>{{ item.is_passed|yesno:"통과,실패" }}</td>
                         <td>{{ item.create_time|date:"Y-m-d H:i" }}</td>
+                        {% if request.user.is_superuser %}
                         <td>{{ item.auth_user.username }}</td>
+                        {% endif %}
                     </tr>
                     {% endfor %}
                     {% else %}
                     <tr>
-                        <td colspan="5">퀴즈 이력이 없습니다.</td>
+                        <td class="noneDataRow" colspan="{% if request.user.is_superuser %}4{% else %}5{% endif %}">퀴즈 이력이 없습니다.</td>
                     </tr>
                     {% endif %}
                 </tbody>

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}공지사항 상세{% endblock %}
+{% block title %}공지 사항 상세{% endblock %}
 
 {% block content %}
 <h2>{{ notice.title }}</h2>
@@ -9,9 +9,9 @@
     {{ notice.body|safe }}
 </div>
 {% if notice.file %}
-    <div>
-        <a href="{{ notice.file.url }}" download>첨부 파일 다운로드</a>
-    </div>
+<div>
+    <a href="{{ notice.file.url }}" download>첨부 파일 다운로드</a>
+</div>
 {% endif %}
 <div class="mt-3">
     <a href="{% url 'main:user_dashboard' %}" class="btn btn-primary">목록으로 돌아가기</a>

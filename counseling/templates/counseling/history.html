@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}AI 상담 이력{% endblock %}
 
 {% block content %}
 {% load static %}
@@ -24,7 +24,7 @@
     {% csrf_token %}
     <div class="dashboard">
         <div>
-            <h3> 상담 이력</h3>
+            <h3>AI 상담 이력</h3>
         </div>
         <div>
             <div class="search-container">
@@ -41,18 +41,18 @@
             <table class="styled-table">
                 <colgroup>
                     <col width="7%">
-                    <col width="20%">
-                    <col width="20%">
-                    <col width="*">
                     <col width="10%">
+                    <col width="*">
+                    <col width="30%">
+                    <col width="30%">
                 </colgroup>
                 <thead>
                     <tr>
                         <th>번호</th>
+                        <th>고객 명</th>
+                        <th>AI 상담 일자</th>
                         <th>문의 사항</th>
                         <th>조치 사항</th>
-                        <th>상담 일자</th>
-                        <th>고객 명</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -60,15 +60,27 @@
                     {% for item in data %}
                     <tr data-url="{% url 'counseling:detail' item.id %}" class="active-row">
                         <td>{{ forloop.counter }}</td>
-                        <td>{{ item.inquiries }}</td>
-                        <td>{{ item.action }}</td>
-                        <td>{{ item.create_time }}</td>
                         <td>{{ item.customer.name }}</td>
+                        <td>{{ item.create_time }}</td>
+                        <td>
+                            {% if item.inquiries %}
+                            {{ item.inquiries }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.action %}
+                            {{ item.action }}
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
                     </tr>
                     {% endfor %}
                     {% else %}
                     <tr>
-                        <td colspan="5">상담 이력이 없습니다.</td>
+                        <td class="noneDataRow" colspan="5">AI 상담 이력이 없습니다.</td>
                     </tr>
                     {% endif %}
                 </tbody>

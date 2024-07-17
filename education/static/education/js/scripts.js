@@ -94,7 +94,6 @@ function sendMessage(event) {
                 childDiv.innerText = data.output;
                 document.getElementById("readonly-chat-content").appendChild(childDiv);
             } else if (data.error) {
-
                 console.error("Error from server:", data.error);
             }
         })
@@ -341,6 +340,7 @@ function windowChange(bool) {
 
 function textToSpeech(text) {
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'ko-KR'; // 한국어 설정
+    utterance.lang = "ko-KR"; // 한국어 설정
     utterance.rate = 2;
     speechSynthesis.speak(utterance);
+}

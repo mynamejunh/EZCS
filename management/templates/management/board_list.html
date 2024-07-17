@@ -1,17 +1,10 @@
 {% extends 'base_manager.html' %}
-<<<<<<< HEAD
 {% block title %}공지사항 목록{% endblock %}
 
 {% block content %}
 <h2>공지사항 목록</h2>
 <a href="{% url 'management:board_create' %}" class="btn btn-primary mb-3">공지사항 작성</a>
-=======
-{% block title %}공지 사항 목록{% endblock %}
 
-{% block content %}
-<h2>공지 사항 목록</h2>
-<a href="{% url 'management:board_create' %}" class="btn btn-primary mb-3">공지 사항 작성</a>
->>>>>>> 38248724feba2a386bba5ff5ab6ce968f86c4dba
 <ul>
     {% for board in boards %}
     <li>
@@ -19,14 +12,8 @@
         <span>{{ board.create_time|date:"Y.m.d" }}</span>
     </li>
     {% empty %}
-<<<<<<< HEAD
-    <li>등록된 공지사항이 없습니다.</li>
-    {% endfor %}
-</ul>
-{% endblock %}
-=======
+
     <li>등록된 공지 사항이 없습니다.</li>
     {% endfor %}
 </ul>
 {% endblock %}
->>>>>>> 38248724feba2a386bba5ff5ab6ce968f86c4dba

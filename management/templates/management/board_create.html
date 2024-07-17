@@ -1,15 +1,9 @@
 {% extends 'base_manager.html' %}
-<<<<<<< HEAD
-{% block title %}공지사항 작성{% endblock %}
 
-{% block content %}
-<h2>공지사항 작성</h2>
-=======
 {% block title %}공지 사항 작성{% endblock %}
 
 {% block content %}
 <h2>공지 사항 작성</h2>
->>>>>>> 38248724feba2a386bba5ff5ab6ce968f86c4dba
 <form method="post" action="{% url 'management:board_create' %}" enctype="multipart/form-data">
     {% csrf_token %}
     <table class="styled-table-deail">
@@ -61,17 +55,10 @@
         theme: 'snow'
     });
 
-<<<<<<< HEAD
-    document.querySelector('form').onsubmit = function() {
-=======
+
     document.querySelector('form').onsubmit = function () {
->>>>>>> 38248724feba2a386bba5ff5ab6ce968f86c4dba
         var body = document.querySelector('input[name=body]');
         body.value = quill.root.innerHTML;
     };
 </script>
-<<<<<<< HEAD
 {% endblock %}
-=======
-{% endblock %}
->>>>>>> 38248724feba2a386bba5ff5ab6ce968f86c4dba

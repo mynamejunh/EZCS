@@ -1,10 +1,6 @@
 {% extends 'base.html' %}
 
-<<<<<<< HEAD
 {% block title %}공지사항 상세{% endblock %}
-=======
-{% block title %}공지 사항 상세{% endblock %}
->>>>>>> 38248724feba2a386bba5ff5ab6ce968f86c4dba
 
 {% block content %}
 <h2>{{ notice.title }}</h2>
@@ -13,21 +9,13 @@
     {{ notice.body|safe }}
 </div>
 {% if notice.file %}
-<<<<<<< HEAD
-    <div>
-        <a href="{{ notice.file.url }}" download>첨부 파일 다운로드</a>
-    </div>
-=======
+
 <div>
     <a href="{{ notice.file.url }}" download>첨부 파일 다운로드</a>
 </div>
->>>>>>> 38248724feba2a386bba5ff5ab6ce968f86c4dba
 {% endif %}
 <div class="mt-3">
     <a href="{% url 'main:user_dashboard' %}" class="btn btn-primary">목록으로 돌아가기</a>
 </div>
-<<<<<<< HEAD
+
 {% endblock %}
-=======
-{% endblock %}
->>>>>>> 38248724feba2a386bba5ff5ab6ce968f86c4dba

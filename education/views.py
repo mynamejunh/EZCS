@@ -41,7 +41,6 @@ def chat_view(request):
             output = chatbot.chat(message)
 
             evaluation_chatbot = Chatbot(
-                # model_id="gpt-3.5-turbo",
                 model_id="gpt-4o",
                 category=category,
                 THRESHOLD=2,
@@ -65,7 +64,6 @@ def chat_view(request):
         elif category:
             # Chatbot 객체 초기화
             chatbot = Chatbot(
-                # model_id="ft:gpt-3.5-turbo-0125:personal::9gS63IJD",
                 model_id="gpt-4o",
                 category=category,
                 THRESHOLD=2,

@@ -1,5 +1,6 @@
 function validatePassword(password) {
-    var passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    // 최소 8자 이상, 하나 이상의 소문자, 숫자, 특수문자를 포함해야 함
+    var passwordRegex = /^(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[a-z\d@$!%*?&]{8,}$/;
     return passwordRegex.test(password);
 }
 
@@ -20,7 +21,11 @@ function submitProfile() {
     }
 
     if (password && !validatePassword(password)) {
-        alert("비밀번호는 최소 8자 이상이어야 하며, 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다.");
+        alert("비밀번호는 최소 8자 이상이어야 하며, 소문자, 숫자, 특수문자를 포함해야 합니다.");
+        return false;
+    }
+
+    if (!confirm("변경된 사항을 저장하시겠습니까?")) {
         return false;
     }
 
@@ -60,4 +65,10 @@ function submitProfile() {
 
 $(document).ready(function () {
     $("#birth_date").val(new Date($("#birth_date").val()).toISOString().slice(0, 10));
+
+    $("#editProfileForm").on("submit", function(event) {
+        event.preventDefault();
+        submitProfile();
+    });
 });
+

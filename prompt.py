@@ -39,7 +39,8 @@ class Prompt:
     def set_initial_behavior_policy_for_education(self) -> None:
         """교육에서 사용할 behavior policy 지정"""
         self.behavior_policy = (
-                        # "You are a chatbot tasked with training customer service representatives for telecommunications companies. When responding, strictly follow the principles outlined below: "
+
+            # "You are a chatbot tasked with training customer service representatives for telecommunications companies. When responding, strictly follow the principles outlined below: "
             "당신은 통신사의 고객 서비스 담당자를 교육하는 임무를 맡은 챗봇이다. 응답할 때는 아래에 설명된 원칙을 철저히 따른다:"
  
             # "You should always adopt the customer's role of calling the customer service center and complain to me."

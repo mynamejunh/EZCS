@@ -206,7 +206,7 @@ function stopCounseling() {
 }
 
 function loadAIMessages(classify, message) {
-    appendAILoading();
+    if (data.success && classify === "customer") appendAILoading();
 
     const formData = new FormData();
     formData.append("classify", classify);
@@ -234,7 +234,6 @@ function loadAIMessages(classify, message) {
             console.error("Error:", error);
             alert("ERROR:", error);
         });
-
 }
 
 function changeDisabled(bool) {
@@ -368,7 +367,7 @@ function appendAILoading() {
 }
 
 function removeAILoading() {
-    const messageElement = document.querySelector('.message-loading');
+    const messageElement = document.querySelector(".message-loading");
     if (messageElement) {
         messageElement.remove();
     }

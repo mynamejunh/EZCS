@@ -64,8 +64,12 @@ def chat_view(request):
         elif category:
             # Chatbot 객체 초기화
             chatbot = Chatbot(
+<<<<<<< HEAD
                 # model_id="ft:gpt-3.5-turbo-0125:personal::9gS63IJD",
                 model_id='gpt-4o',
+=======
+                model_id="gpt-4o",
+>>>>>>> 2470cd6bd285cf8af7ef053d21826f0353f45cd4
                 category=category,
                 THRESHOLD=2,
                 behavior_policy=prompt.get_behavior_policy(),

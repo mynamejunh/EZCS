@@ -1,5 +1,4 @@
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from accounts.models import CounselorProfile  
 from django.shortcuts import render, get_object_or_404
@@ -12,9 +11,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
 from counseling.models import Log as CounselLog
 from education.models import Log as EducationLog, QuizHistory
-from django.db.models import Count
+from django.db.models import Count, DateField
 from django.db.models.functions import Cast
-from django.db.models import DateField
 
 
 def user_dashboard(request):
@@ -55,6 +53,7 @@ def get_calendar(request, start, end):
 
     return JsonResponse(data, safe=False)
 
+
 def notice_detail(request, id):
     notice = get_object_or_404(Board, id=id)
     is_image = False
@@ -62,22 +61,23 @@ def notice_detail(request, id):
         is_image = notice.file.url.lower().endswith(('.jpg', '.jpeg', '.png'))
     return render(request, 'main/notice_detail.html', {'notice': notice, 'is_image': is_image})
 
+
 def start_ezcs(request):
     return render(request, 'main/startezcs.html')
 
-@login_required
+
 def edit_profile(request):
     user = request.user
-    profile = get_object_or_404(CounselorProfile, auth_user=user)  # 수정된 부분
+    profile = get_object_or_404(CounselorProfile, auth_user=user)
 
     if request.method == 'POST':
         user.first_name = request.POST.get('name')
         user.email = request.POST.get('email') 
-        profile.phone_number = request.POST.get('phone_number')  # CounselorProfile 모델의 phone_number 필드 수정
-        profile.birth_date = request.POST.get('birth_date')  # CounselorProfile 모델의 birth_date 필드 수정
-        profile.address_code = request.POST.get('address_code')  # CounselorProfile 모델의 address_code 필드 수정
-        profile.address = request.POST.get('address')  # CounselorProfile 모델의 address 필드 수정
-        profile.address_detail = request.POST.get('address_detail')  # CounselorProfile 모델의 address_detail 필드 수정
+        profile.phone_number = request.POST.get('phone_number')
+        profile.birth_date = request.POST.get('birth_date')
+        profile.address_code = request.POST.get('address_code')
+        profile.address = request.POST.get('address')
+        profile.address_detail = request.POST.get('address_detail')
         password = request.POST.get('password')
         if password:
             try:
@@ -90,10 +90,12 @@ def edit_profile(request):
         profile.save()  
         return JsonResponse({'result': True, 'msg': '회원정보가 성공적으로 수정되었습니다.'})
 
-    return render(request, 'main/edit_profile.html', {'user': user, 'profile': profile})  # 프로필 정보 전달
+    return render(request, 'main/edit_profile.html', {'user': user, 'profile': profile})
+
 
 def contract(request):
     return render(request, 'main/contract.html')
+
 
 def privacy(request):
     return render(request, 'main/privacy.html')

@@ -125,13 +125,24 @@ def history(request):
         query = Q(auth_user=request.user.id)
 
     query1 = Q()
-    if search_text:
-        query1 = Q(customer__name__icontains=search_text)
+    if search_select:
+        valid_fields = {
+            '1': 'customer__name__icontains',
+            '2': 'inquiries__icontains',
+            '3': 'action__icontains',
+        }
+
+        if search_select == '0':
+            for val in valid_fields.values():
+                query1 |= Q(**{val: search_text})
+        else:
+            search_field = valid_fields[search_select]
+            query1 = Q(**{search_field: search_text})
 
     query2 = Q()
     if start_date and end_date:
-        query2 &= Q(create_time__gte=start_date)
-        query2 &= Q(create_time__lte=end_date)
+        query2 &= Q(create_time__gte=start_date+" 00:00:00")
+        query2 &= Q(create_time__lte=end_date+" 23:59:59")
     else:
         one_month_ago = datetime.now() - timedelta(days=30)
         query2 &= Q(create_time__gte=one_month_ago)
@@ -139,9 +150,7 @@ def history(request):
         start_date = one_month_ago.strftime("%Y-%m-%d")
         end_date = datetime.now().strftime("%Y-%m-%d")
 
-    data = Log.objects.filter(query & query1 & query2).order_by(
-        "-create_time", "customer_id", "auth_user_id"
-    )
+    data = Log.objects.filter(query & query1 & query2).order_by("-create_time", "customer_id", "auth_user_id")
 
     paginator = Paginator(data, 10)
     page = request.GET.get("page")

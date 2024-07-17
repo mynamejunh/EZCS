@@ -26,19 +26,31 @@
             <h3>퀴즈 이력</h3>
         </div>
         <div class="search-container">
-            <input type="text" class="form-control search-input" id="searchText" name="searchText" value="{{ searchText }}" placeholder="검색창">
-            <select class="form-control search-select" name="searchSelect" id="searchSelect">
-                <option value="" {% if searchSelect == '' %}selected{% endif %}>카테고리 선택</option>
-                <option value="0" {% if searchSelect == '0' %}selected{% endif %}>부가서비스</option>
-                <option value="1" {% if searchSelect == '1' %}selected{% endif %}>서비스정책</option>
-                <option value="2" {% if searchSelect == '2' %}selected{% endif %}>요금관련</option>
-            </select>
-            <select class="form-control search-select" name="result" id="result">
-                <option value="" {% if result == '' %}selected{% endif %}>결과선택</option>
-                <option value="pass" {% if result == 'pass' %}selected{% endif %}>통과</option>
-                <option value="fail" {% if result == 'fail' %}selected{% endif %}>실패</option>
-            </select>
-            <button type="submit" class="btn btn-primary search-button">검색</button>
+            <ul>
+                <li>
+                    <select name="searchSelect" id="searchSelect" class="form-control" style="cursor: pointer;" onchange="submit();">
+                        <option value="" {% if searchSelect == '' %}selected{% endif %}>카테고리 선택</option>
+                        <option value="0" {% if searchSelect == '0' %}selected{% endif %}>부가서비스</option>
+                        <option value="1" {% if searchSelect == '1' %}selected{% endif %}>서비스정책</option>
+                        <option value="2" {% if searchSelect == '2' %}selected{% endif %}>요금관련</option>
+                    </select>
+                </li>
+                <li>
+                    <select class="form-control search-select" name="result" id="result" onchange="submit();">
+                        <option value="" {% if result == '' %}selected{% endif %}>결과선택</option>
+                        <option value="1" {% if result == '1' %}selected{% endif %}>통과</option>
+                        <option value="0" {% if result == '0' %}selected{% endif %}>실패</option>
+                    </select>
+                </li>
+                <li><span class="form-control my-span">퀴즈 일자</span></li>
+                <li>
+                    <input type="date" id="startDate" name="startDate" class="form-control" value="{{ startDate }}" onkeydown="return false" onchange="submit();">
+                </li>
+                <li><span class="form-control my-span">~</span></li>
+                <li>
+                    <input type="date" id="endDate" name="endDate" class="form-control" value="{{ endDate }}" onkeydown="return false" onchange="submit();">
+                </li>
+            </ul>
         </div>
         <div>
             <p>총 {{ data.paginator.count }}건</p>
@@ -50,7 +62,7 @@
                         <th>순번</th>
                         <th>카테고리</th>
                         <th>결과</th>
-                        <th>날짜</th>
+                        <th>퀴즈 일자</th>
                         {% if request.user.is_superuser %}
                         <th>사용자</th>
                         {% endif %}

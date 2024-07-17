@@ -19,7 +19,6 @@ body {
     /* Ensures the body takes at least full viewport height */
 }
 
-
 .main-content {
     /* margin-top: 80px;  */
     padding: 20px;
@@ -29,7 +28,6 @@ body {
     flex-direction: column;
     height: 100%;
     background-color: whitesmoke;
-
 }
 
 img.ezcs-logo {
@@ -124,7 +122,7 @@ img.ezcs-logo {
     font-weight: bold;
 }
 
-.has-submenu>a::after {
+.has-submenu > a::after {
     content: none;
 }
 
@@ -312,4 +310,33 @@ img.ezcs-logo {
 
 .noneDataRow {
     text-align: center;
+}
+
+.search-container ul {
+    padding: 0;
+}
+
+.search-container ul li {
+    display: inline-block;
+    list-style: none;
+}
+
+.search-container ul li select,
+.search-container ul li span,
+.search-container ul li input[type="date"],
+.search-container ul li input[type="text"],
+.search-container ul li input[type="submit"],
+.search-container ul li input[type="button"] {
+    width: fit-content;
+    height: 3em;
+}
+
+.search-container ul li input[type="submit"],
+.search-container ul li input[type="button"] {
+    background-color: #58b0e3;
+    border-color: #58b0e3;
+}
+
+.search-container ul li span {
+    border: none;
 }

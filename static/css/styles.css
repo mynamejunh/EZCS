@@ -15,23 +15,23 @@ body {
     background-color: #f5f7fb;
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Ensures the body takes at least full viewport height */
+    min-height: 100vh;
+    /* Ensures the body takes at least full viewport height */
 }
 
-form {
-    width: 100%;
-}
 
 .main-content {
     /* margin-top: 80px;  */
     padding: 20px;
-    margin-left: 40px;
-    flex-grow: 1; /* Ensures main content takes available space */
-    /* display: flex; */
-    display: contents;
-    /* flex-direction: column; */
-    height: 100%; /* Adjusted to account for fixed header */
+    flex-grow: 1;
+    /* Ensures main content takes available space */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: whitesmoke;
+
 }
+
 img.ezcs-logo {
     width: 100px;
     height: auto;
@@ -113,12 +113,18 @@ img.ezcs-logo {
     padding: 5px 15px;
 }
 
-.sidebar .menu .submenu a.active {
+.sidebar .menu .submenu a.active,
+.sidebar .menu .has-submenu a.active {
     color: #1c90f3;
     font-weight: bold;
 }
 
-.has-submenu > a::after {
+.sidebar .menu a.active {
+    color: #1c90f3;
+    font-weight: bold;
+}
+
+.has-submenu>a::after {
     content: none;
 }
 
@@ -200,7 +206,8 @@ img.ezcs-logo {
     padding: 10px;
     border-top: 1px solid #e0e0e0;
     margin-left: 20px;
-    flex-shrink: 0; /* Prevents footer from shrinking */
+    flex-shrink: 0;
+    /* Prevents footer from shrinking */
 }
 
 .footer-content {

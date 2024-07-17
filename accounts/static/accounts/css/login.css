@@ -123,8 +123,9 @@ p a:hover {
     height: 200px;
     padding: 10px;
     border: 1px solid #ddd;
-    margin-top: 5px;
     margin-bottom: 20px;
+    color: #767678;
+    font-size: 15px;
 }
 
 .input_check input {

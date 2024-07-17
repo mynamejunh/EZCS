@@ -70,7 +70,7 @@
         </div>
         <div>
             <ul class="menu">
-                <li><a href="{% url 'main:edit_profile' %}">내 정보</a></li>
+                <li><a href="#" id="profileLink">내 정보</a></li>
             </ul>
         </div>
     </div>
@@ -103,7 +103,27 @@
             </div>
         </footer>
     </div>
-
+    <div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="passwordModalLabel">비밀번호 확인</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="passwordCheck" class="form-label">비밀번호</label>
+                        <input type="password" class="form-control" id="passwordCheck" placeholder="비밀번호를 입력하세요">
+                        <div class="invalid-feedback" id="passwordCheckError">비밀번호가 일치하지 않습니다.</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" onclick="checkPassword()">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="{% static 'js/scripts.js' %}"></script>
 </body>
 

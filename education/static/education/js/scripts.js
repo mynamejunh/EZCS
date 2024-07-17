@@ -45,6 +45,7 @@ function selectCategory(category) {
             document.getElementById("selected-category").innerText = category;
             document.getElementById("chat-content").innerHTML = ""; // 채팅 내용을 지움
             appendMessage("bot", data.initial_question); // 첫 질문 출력
+            textToSpeech(data.initial_question);
 
             windowChange(true);
         })
@@ -64,6 +65,8 @@ function sendMessage(event) {
     // 사용자 메시지를 채팅 상자에 추가
     appendMessage("user", message);
 
+    appendMessage("interim", "AI가 메시지를 생성중입니다  <div class='spinner-grow spinner-grow-sm' role='status'></div>");
+
     // 사용자 메시지를 서버로 전송
     const formData = new FormData();
     formData.append("message", message);
@@ -82,16 +85,23 @@ function sendMessage(event) {
             // 봇의 응답을 채팅 상자에 추가
             appendMessage("bot", data.response);
             // lastChatbotMessage = data.response;
+            removeMessageInterimDiv();
+            textToSpeech(data.response);
+
             if (data.output) {
                 const childDiv = document.createElement("div");
                 childDiv.className = "evaluated-message-bot";
                 childDiv.innerText = data.output;
                 document.getElementById("readonly-chat-content").appendChild(childDiv);
             } else if (data.error) {
+
                 console.error("Error from server:", data.error);
             }
         })
-        .catch((error) => console.error("Error:", error));
+        .catch((error) => {
+            removeMessageInterimDiv();
+            console.error("Error:", error);
+        });
 }
 
 // 메시지를 채팅 상자에 추가하는 함수
@@ -188,6 +198,7 @@ function startEducation() {
                 if (finalTranscript.trim() !== "") {
                     const finalDiv = createFinalDiv(finalTranscript);
                     chatContent.appendChild(finalDiv);
+                    appendMessage("interim", "AI가 메시지를 생성중입니다  <div class='spinner-grow spinner-grow-sm' role='status'></div>");
                     appendMessageToReadonly("user", finalTranscript);
 
                     const formData = new FormData();
@@ -205,6 +216,7 @@ function startEducation() {
                         .then((response) => response.json())
                         .then((data) => {
                             // 봇의 응답을 채팅 상자에 추가
+                            removeMessageInterimDiv();
                             appendMessage("bot", data.response);
                             if (data.output) {
                                 const childDiv = document.createElement("div");
@@ -215,7 +227,10 @@ function startEducation() {
                                 console.error("Error from server:", data.error);
                             }
                         })
-                        .catch((error) => console.error("Error:", error));
+                        .catch((error) => {
+                            console.error("Error:", error);
+                            removeMessageInterimDiv();
+                        });
                 }
 
                 interimDiv.remove();
@@ -283,6 +298,13 @@ function removeExistingInterimDiv() {
     }
 }
 
+function removeMessageInterimDiv() {
+    const existingInterimDiv = document.querySelector(".message-interim");
+    if (existingInterimDiv) {
+        existingInterimDiv.remove();
+    }
+}
+
 // output-msg 생성(종료 버튼 클릭시 동작)
 function createFinalDiv(text) {
     const finalDiv = document.createElement("div");
@@ -316,3 +338,9 @@ function windowChange(bool) {
     document.getElementById("chat-section-readonly").classList.toggle("hidden", !bool);
     document.getElementById("submit-container").classList.toggle("hidden", !bool);
 }
+
+function textToSpeech(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'ko-KR'; // 한국어 설정
+    utterance.rate = 2;
+    speechSynthesis.speak(utterance);

@@ -1,12 +1,12 @@
 {% extends 'base_manager.html' %}
-{% block title %}Edit User{% endblock %}
+{% block title %}직원 정보 수정{% endblock %}
 
 {% block content %}
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script src="/static/js/execDaumPost.js"></script>
 {% load static %}
 <script src="{% static 'accounts\js\signup.js' %}"></script>
-<h2>직원정보 수정</h2>
+<h2>직원 정보 수정</h2>
 <form id="frm" action="{% url 'management:edit' user.id flag %}" method="POST">
     {% csrf_token %}
     <table class="styled-table-deail">

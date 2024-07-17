@@ -15,9 +15,9 @@ class Log(models.Model):
     )
 
     CATEGORY_CHOICES = [
-        (0, 'Additional')
-        , (1, 'Policies')
-        , (2, 'Charges')
+        (0, '부가 서비스')
+        , (1, '서비스 정책')
+        , (2, '요금 관련')
     ]
 
     category = models.IntegerField(
@@ -98,9 +98,9 @@ class Quiz(models.Model):
     )
 
     CATEGORY_CHOICES = [
-        (0, 'Additional')
-        , (1, 'Policies')
-        , (2, 'Charges')
+        (0, '부가 서비스')
+        , (1, '서비스 정책')
+        , (2, '요금 관련')
     ]
 
     category = models.IntegerField(
@@ -176,9 +176,9 @@ class QuizHistory(models.Model):
     )
     
     CATEGORY_CHOICES = [
-        (0, 'Additional')
-        , (1, 'Policies')
-        , (2, 'Charges')
+        (0, '부가 서비스')
+        , (1, '서비스 정책')
+        , (2, '요금 관련')
     ]
 
     category = models.IntegerField(

@@ -1,5 +1,5 @@
 {% extends 'base_manager.html' %}
-{% block title %}회원 가입{% endblock %}
+{% block title %}관리자 생성{% endblock %}
 
 {% block content %}
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
@@ -15,7 +15,7 @@
     <div class="input-form-backgroud row">
         <div class="input-form">
             <div>
-                <h2>회원가입</h2>
+                <h2>관리자 생성</h2>
             </div>
             <form id="signupForm" class="validation-form" novalidate data-url="{% url 'management:adminsignup' %}" data-csrf="{{ csrf_token }}">
                 {% csrf_token %}
@@ -119,7 +119,7 @@
                     <label class="custom-control-label" for="aggrement">개인정보 수집 및 이용에 동의합니다.</label>
                 </div>
                 <div style="text-align: center;">
-                    <input type="button" value="회원 생성" class="btn btn-outline-primary" onclick="signup()">
+                    <input type="button" value="관리자 생성" class="btn btn-outline-primary" onclick="signup()">
                     <!-- </div> -->
                 </div>
                 <div>

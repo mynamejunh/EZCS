@@ -1,51 +1,59 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from accounts.models import User, CounselorProfile  
-from django.shortcuts import render, get_object_or_404, redirect
+from accounts.models import CounselorProfile  
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
-from django.urls import reverse
 from management.models import Board
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
 from counseling.models import Log as CounselLog
 from education.models import Log as EducationLog, QuizHistory
-from django.db.models.functions import TruncDate
 from django.db.models import Count
+from django.db.models.functions import Cast
+from django.db.models import DateField
+
 
 def user_dashboard(request):
-    counsel_data = CounselLog.objects.filter(auth_user=request.user.id)\
-                                     .annotate(date=TruncDate('create_time'))\
-                                     .values('date')\
-                                     .annotate(count=Count('id'))\
-                                     .values('date', 'count')
-    
-    # EducationLog 데이터를 'create_time' 기준으로 그룹화
-    education_data = EducationLog.objects.filter(auth_user=request.user.id)\
-                                         .annotate(date=TruncDate('create_time'))\
-                                         .values('date')\
-                                         .annotate(count=Count('id'))\
-                                         .values('date', 'count')
-    
-    # QuizHistory 데이터를 'create_time' 기준으로 그룹화
-    quiz_data = QuizHistory.objects.filter(auth_user=request.user.id)\
-                                   .annotate(date=TruncDate('create_time'))\
-                                   .values('date')\
-                                   .annotate(count=Count('id'))\
-                                   .values('date', 'count')
-    
-    # JSON으로 변환할 수 있도록 데이터 병합
-    data = list(counsel_data) + list(education_data) + list(quiz_data)
-
-
     notices = Board.objects.filter(flag=0).order_by('-create_time')
     paginator = Paginator(notices, 10)
     page = request.GET.get('page')
     notices = paginator.get_page(page)
-    return render(request, 'main/index.html', {'notices': notices, 'data':data})
+    return render(request, 'main/index.html', {'notices': notices})
+
+
+def get_log_data(model_class, start, end, request_user_id=None):
+    queryset = model_class.objects.filter(create_time__gte=start, create_time__lte=end)\
+        .annotate(date=Cast('create_time', output_field=DateField()))\
+            .values('date')\
+                .annotate(count=Count('id'))\
+                    .order_by('date')
+    
+    if request_user_id is not None:
+        queryset = queryset.filter(auth_user=request_user_id)
+    
+    return [{'type': str(model_class), 'date': item['date'], 'count': item['count']} for item in queryset]
+
+
+def get_calendar(request, start, end):
+    start += " 00:00:00"
+    end += " 00:00:00"
+
+    if request.user.is_superuser:
+        counsel_data = get_log_data(CounselLog, start, end)
+        education_data = get_log_data(EducationLog, start, end)
+        quiz_data = get_log_data(QuizHistory, start, end)
+    else:
+        counsel_data = get_log_data(CounselLog, start, end, request.user.id)
+        education_data = get_log_data(EducationLog, start, end, request.user.id)
+        quiz_data = get_log_data(QuizHistory, start, end, request.user.id)
+    
+    data = counsel_data + education_data + quiz_data
+
+    return JsonResponse(data, safe=False)
 
 def notice_detail(request, id):
     notice = get_object_or_404(Board, id=id)

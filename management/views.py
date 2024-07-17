@@ -8,6 +8,11 @@ from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 
+def board_delete(request, id):
+    board = get_object_or_404(Board, id=id)
+    board.delete()
+    return redirect('management:board_list')
+
 def validate_image(file):
     valid_mime_types = ['image/jpeg', 'image/png']
     if file.content_type not in valid_mime_types:

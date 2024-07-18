@@ -48,7 +48,8 @@ h1 {
 }
 
 .quiz-container {
-    background-color: #f9f9f9;
+    /* background-color: #f9f9f9; */
+    background-color: #fff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -56,6 +57,7 @@ h1 {
     position: relative;
     min-height: 200px;
 }
+
 .question {
     margin-bottom: 20px;
 }
@@ -103,7 +105,8 @@ h1 {
     padding: 20px;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-    margin-bottom: 20px; /* 추가된 여백 */
+    margin-bottom: 20px;
+    /* 추가된 여백 */
 }
 
 .explanation-title,
@@ -129,7 +132,8 @@ h1 {
     padding: 20px;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-    margin-bottom: 40px; /* 추가된 여백 */
+    margin-bottom: 40px;
+    /* 추가된 여백 */
 }
 
 .submit-container {
@@ -139,7 +143,7 @@ h1 {
     justify-content: flex-end;
 }
 
-.submit-button {
+.submit-button, .end-button {
     padding: 10px 20px;
     font-size: 16px;
     background-color: #2ec4b6;
@@ -149,6 +153,10 @@ h1 {
     cursor: pointer;
 }
 
-.submit-button:hover {
+.end-button {
+    text-decoration: none;
+}
+
+.submit-button:hover, .end-button:hover{
     background-color: #007a63;
 }

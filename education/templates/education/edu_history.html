@@ -27,14 +27,24 @@
             <h3>AI 트레이너 이력</h3>
         </div>
         <div class="search-container">
-            <input type="text" class="form-control search-input" id="searchText" name="searchText" value="{{ searchText }}" placeholder="검색창">
-            <select class="form-control search-select" name="searchSelect" id="searchSelect">
-                <option value="" {% if searchSelect == '' %}selected{% endif %}>카테고리 선택</option>
-                <option value="0" {% if searchSelect == '0' %}selected{% endif %}>부가서비스</option>
-                <option value="1" {% if searchSelect == '1' %}selected{% endif %}>서비스정책</option>
-                <option value="2" {% if searchSelect == '2' %}selected{% endif %}>요금관련</option>
-            </select>
-            <input type="submit" class="btn btn-primary search-button" value="검색">
+            <ul>
+                <li>
+                    <select name="searchSelect" id="searchSelect" class="form-control" style="cursor: pointer;" onchange="submit();">
+                        <option value="" {% if searchSelect == '' %}selected{% endif %}>카테고리 선택</option>
+                        <option value="0" {% if searchSelect == '0' %}selected{% endif %}>부가서비스</option>
+                        <option value="1" {% if searchSelect == '1' %}selected{% endif %}>서비스정책</option>
+                        <option value="2" {% if searchSelect == '2' %}selected{% endif %}>요금관련</option>
+                    </select>
+                </li>
+                <li><span class="form-control my-span">AI 트레이닝 일자</span></li>
+                <li>
+                    <input type="date" id="startDate" name="startDate" class="form-control" value="{{ startDate }}" onkeydown="return false" onchange="submit();">
+                </li>
+                <li><span class="form-control my-span">~</span></li>
+                <li>
+                    <input type="date" id="endDate" name="endDate" class="form-control" value="{{ endDate }}" onkeydown="return false" onchange="submit();">
+                </li>
+            </ul>
         </div>
         <div>
             <p>총 {{ data.paginator.count }}건</p>
@@ -45,7 +55,13 @@
                     <tr>
                         <th>순번</th>
                         <th>카테고리</th>
-                        <th>날짜</th>
+                        <th>AI 트레이닝 일자</th>
+                        <th>정확성</th>
+                        <th>친절함</th>
+                        <th>문제 해결 능력</th>
+                        <th>추가 정보 제공</th>
+                        <th>응답 시간</th>
+                        <th>평가 점수</th>
                         {% if request.user.is_superuser %}
                         <th>사용자</th>
                         {% endif %}
@@ -56,16 +72,22 @@
                     {% for item in data %}
                     <tr data-url="{% url 'education:edu_details' item.id %}">
                         <td>{{ forloop.counter }}</td>
-                        <td>{{ item.get_category_display }}</td>
+                        <td>{{ item.category_display }}</td>
                         <td>{{ item.create_time|date:"Y-m-d H:i" }}</td>
+                        <td>{{ item.avg_accuracy_score }}</td>
+                        <td>{{ item.avg_kind_score }}</td>
+                        <td>{{ item.avg_solving_score }}</td>
+                        <td>{{ item.avg_add_score }}</td>
+                        <td>{{ item.avg_time_score }}</td>
+                        <td>{{ item.overall_avg_score }}</td>
                         {% if request.user.is_superuser %}
-                        <td>{{ item.auth_user.username }}</td>
+                        <td>{{ item.auth_user__username }}</td>
                         {% endif %}
                     </tr>
                     {% endfor %}
                     {% else %}
                     <tr>
-                        <td class="noneDataRow" colspan="{% if request.user.is_superuser %}3{% else %}4{% endif %}">AI 트레이너 이력이 없습니다.</td>
+                        <td class="noneDataRow" colspan="{% if request.user.is_superuser %}9{% else %}10{% endif %}">AI 트레이너 이력이 없습니다.</td>
                     </tr>
                     {% endif %}
                 </tbody>

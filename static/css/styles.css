@@ -15,23 +15,21 @@ body {
     background-color: #f5f7fb;
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Ensures the body takes at least full viewport height */
-}
-
-form {
-    width: 100%;
+    min-height: 100vh;
+    /* Ensures the body takes at least full viewport height */
 }
 
 .main-content {
     /* margin-top: 80px;  */
     padding: 20px;
-    margin-left: 40px;
-    flex-grow: 1; /* Ensures main content takes available space */
-    /* display: flex; */
-    display: contents;
-    /* flex-direction: column; */
-    height: 100%; /* Adjusted to account for fixed header */
+    flex-grow: 1;
+    /* Ensures main content takes available space */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: whitesmoke;
 }
+
 img.ezcs-logo {
     width: 100px;
     height: auto;
@@ -113,7 +111,13 @@ img.ezcs-logo {
     padding: 5px 15px;
 }
 
-.sidebar .menu .submenu a.active {
+.sidebar .menu .submenu a.active,
+.sidebar .menu .has-submenu a.active {
+    color: #1c90f3;
+    font-weight: bold;
+}
+
+.sidebar .menu a.active {
     color: #1c90f3;
     font-weight: bold;
 }
@@ -200,7 +204,8 @@ img.ezcs-logo {
     padding: 10px;
     border-top: 1px solid #e0e0e0;
     margin-left: 20px;
-    flex-shrink: 0; /* Prevents footer from shrinking */
+    flex-shrink: 0;
+    /* Prevents footer from shrinking */
 }
 
 .footer-content {
@@ -305,4 +310,33 @@ img.ezcs-logo {
 
 .noneDataRow {
     text-align: center;
+}
+
+.search-container ul {
+    padding: 0;
+}
+
+.search-container ul li {
+    display: inline-block;
+    list-style: none;
+}
+
+.search-container ul li select,
+.search-container ul li span,
+.search-container ul li input[type="date"],
+.search-container ul li input[type="text"],
+.search-container ul li input[type="submit"],
+.search-container ul li input[type="button"] {
+    width: fit-content;
+    height: 3em;
+}
+
+.search-container ul li input[type="submit"],
+.search-container ul li input[type="button"] {
+    background-color: #58b0e3;
+    border-color: #58b0e3;
+}
+
+.search-container ul li span {
+    border: none;
 }

@@ -47,19 +47,19 @@
             <a href="{% url 'main:user_dashboard' %}"><img src="{% static 'main/images/EZCS.png' %}" alt="EZCS Logo" class="ezcs-logo"></a>
             <p class="menu-title">MAIN MENU</p>
             <ul class="menu">
-                <li><a href="{% url 'main:user_dashboard' %}">대시보드</a></li>
-
-                <li class="has-submenu {% if request.path == '/counseling/' %}active{% endif %}">
-                    <a href="{% url 'counseling:counsel' %}">AI 상담</a>
+                <li class="has-submenu">
+                    <a href="{% url 'main:user_dashboard' %}" class="{% if request.path == '/' %}active{% endif %}">대시보드</a>
                 </li>
-                <ul class="submenu">
-                    <li><a href="{% url 'counseling:history' %}" class="{% if request.path == '/counseling/history' %}active{% endif %}">AI 상담 이력</a></li>
-                </ul>
-
-                <li class="has-submenu {% if request.path == '/education/' %}active{% endif %}">
-                    <a href="{% url 'education:chat_view' %}">AI 트레이너</a>
+                <li class="has-submenu">
+                    <a href="{% url 'counseling:counsel' %}" class="{% if request.path == '/counseling/' %}active{% endif %}">AI 상담</a>
                     <ul class="submenu">
-                        <li><a href="{% url 'education:edu_history' %}" class="{% if request.path == '/education/edu_history' %}active{% endif %}">AI 트레이너 이력</a></li>
+                        <li><a href="{% url 'counseling:history' %}" class="{% if request.path == '/counseling/history/' %}active{% endif %}">AI 상담 이력</a></li>
+                    </ul>
+                </li>
+                <li class="has-submenu">
+                    <a href="{% url 'education:chat_view' %}" class="{% if request.path == '/education/' %}active{% endif %}">AI 트레이너</a>
+                    <ul class="submenu">
+                        <li><a href="{% url 'education:edu_history' %}" class="{% if request.path == '/education/edu_history/' %}active{% endif %}">AI 트레이너 이력</a></li>
                         {% comment %} <li><a href="{% url 'education:edu_details' %}" class="{% if request.path == '/education/edu_details/' %}active{% endif %}">AI 트레이너 이력 상세(개발용)</a></li> {% endcomment %}
                         <li><a href="{% url 'education:quiz' %}" class="{% if request.path == '/education/quiz/' %}active{% endif %}">퀴즈</a></li>
                         <li><a href="{% url 'education:quiz_history' %}" class="{% if request.path == '/education/quiz_history/' %}active{% endif %}">퀴즈 이력</a></li>
@@ -70,7 +70,7 @@
         </div>
         <div>
             <ul class="menu">
-                <li><a href="#" id="profileLink">내 정보</a></li>
+                <li><a href="{% url 'main:edit_profile' %}" class="{% if request.path == '/edit_profile/' %}active{% endif %}">내 정보</a></li>
             </ul>
         </div>
     </div>

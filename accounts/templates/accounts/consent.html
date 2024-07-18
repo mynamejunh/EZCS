@@ -57,6 +57,9 @@
         <div>
           <input type="button" id="submitButton" value="확인" class="btn btn-outline-primary" style="width: -webkit-fill-available;" onclick="test('{% url "accounts:signup" %}');">
         </div>
+        <div>
+          <p><a href="{% url 'accounts:login' %}"> 로그인으로 돌아가기</a></p>
+      </div>
       </form>
     </div>
   </div>

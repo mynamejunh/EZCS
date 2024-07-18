@@ -1,4 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
+    function BeforeUnloadFunc(event) {
+        event.preventDefault();
+        event.returnValue = '';
+        return '';
+    }
+
+    window.addEventListener('beforeunload', BeforeUnloadFunc);
+
     const form = document.getElementById("quiz-form");
     form.addEventListener("submit", function (event) {
         event.preventDefault(); // 폼 기본 제출 동작 방지
@@ -11,6 +19,13 @@ document.addEventListener("DOMContentLoaded", function () {
             answers.push(input.value);
             quizIds.push(input.name.split('_')[1]);
         });
+
+        const checkedRadioInputs = document.querySelectorAll('input[type="radio"]:checked');
+
+        if (checkedRadioInputs.length < 5) {
+            alert('모든 항목에 응답해주세요.');
+            return;
+        }
 
         document.querySelectorAll('input[type="radio"]:checked').forEach(input => {
             answers.push(input.value);
@@ -35,6 +50,10 @@ document.addEventListener("DOMContentLoaded", function () {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
+            const endButton = document.querySelector('.end-button');
+            endButton.style.display = 'block';
+            const submitButton = document.querySelector('.submit-button');
+            submitButton.parentNode.removeChild(submitButton);
             return response.json(); // JSON 형식으로 응답을 처리
         })
         .then((data) => {
@@ -60,6 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         correctAnswer.querySelector('.correct-answer-content').innerText = result.correct_answer || "정답 없음";
                     }
                 }
+                window.removeEventListener('beforeunload', BeforeUnloadFunc);
             }
         })
         .catch((error) => {

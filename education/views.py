@@ -6,8 +6,8 @@ from .models import *
 from .forms import QuizForm
 
 from django.core.paginator import Paginator
-from django.conf import settings
-from django.db.models import Q
+from django.db.models import Q, Avg, F, Case, When, Value
+from django.db.models.functions import Round
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
@@ -49,10 +49,45 @@ def chat_view(request):
 
             evaluation_output = evaluation_chatbot.chat(message)
 
+            accuracy_score = 0
+            if "정확성: " in evaluation_output:
+                start_idx = evaluation_output.find("정확성: ") + len("정확성: ")
+                end_idx = evaluation_output.find(" -", start_idx)
+                accuracy_score = int(evaluation_output[start_idx:end_idx])
+
+            kind_score = 0
+            if "친절함: " in evaluation_output:
+                start_idx = evaluation_output.find("친절함: ") + len("친절함: ")
+                end_idx = evaluation_output.find(" -", start_idx)
+                kind_score = int(evaluation_output[start_idx:end_idx])
+
+            solving_score = 0
+            if "문제 해결 능력: " in evaluation_output:
+                start_idx = evaluation_output.find("문제 해결 능력: ") + len("문제 해결 능력: ")
+                end_idx = evaluation_output.find(" -", start_idx)
+                solving_score = int(evaluation_output[start_idx:end_idx])
+
+            add_score = 0
+            if "추가 정보 제공: " in evaluation_output:
+                start_idx = evaluation_output.find("추가 정보 제공: ") + len("추가 정보 제공: ")
+                end_idx = evaluation_output.find(" -", start_idx)
+                add_score = int(evaluation_output[start_idx:end_idx])
+
+            time_score = 0
+            if "응답 시간: " in evaluation_output:
+                start_idx = evaluation_output.find("응답 시간: ") + len("응답 시간: ")
+                end_idx = evaluation_output.find(" -", start_idx)
+                time_score = int(evaluation_output[start_idx:end_idx])
+
             LogItem.objects.create(
                 chatbot=output
                 , user=message
                 , evaluate=evaluation_output
+                , accuracy_score=accuracy_score
+                , kind_score=kind_score
+                , solving_score=solving_score
+                , add_score=add_score
+                , time_score=time_score
                 , log_id=log_header_id
             )
 
@@ -114,19 +149,14 @@ def edu_history(request):
     if not request.user.is_superuser:
         query = Q(auth_user=request.user.id)
     
-    query1 = Q()
-    if search_text:
-        query1 = Q(auth_user__username__icontains=search_text)
-        query1 |= Q(auth_user__first_name__icontains=search_text)
-
     query2 = Q()
     if search_select:
         query2 = Q(category=search_select)
 
     query3 = Q()
     if start_date and end_date:
-        query3 &= Q(create_time__gte=start_date)
-        query3 &= Q(create_time__lte=end_date)
+        query3 &= Q(create_time__gte=start_date+" 00:00:00")
+        query3 &= Q(create_time__lte=end_date+" 23:59:59")
     else:
         one_month_ago = datetime.now() - timedelta(days=30)
         query3 &= Q(create_time__gte=one_month_ago)
@@ -134,7 +164,39 @@ def edu_history(request):
         start_date = one_month_ago.strftime('%Y-%m-%d')
         end_date = datetime.now().strftime('%Y-%m-%d')
 
-    data = Log.objects.filter(query & query1 & query2 & query3).order_by('-create_time', 'category')
+    data = Log.objects.filter(query & query2 & query3).order_by('-create_time', 'category')
+    data = data.annotate(
+        avg_accuracy_score=Round(Avg('education_log_items__accuracy_score'), 2),
+        avg_kind_score=Round(Avg('education_log_items__kind_score'), 2),
+        avg_solving_score=Round(Avg('education_log_items__solving_score'), 2),
+        avg_add_score=Round(Avg('education_log_items__add_score'), 2),
+        avg_time_score=Round(Avg('education_log_items__time_score'), 2),
+        overall_avg_score=Round(Avg(
+            F('education_log_items__accuracy_score') +
+            F('education_log_items__kind_score') +
+            F('education_log_items__solving_score') +
+            F('education_log_items__add_score') +
+            F('education_log_items__time_score')
+        ) / 5, 2),
+        category_display=Case(
+            When(category=0, then=Value('부가 서비스')),
+            When(category=1, then=Value('서비스 정책')),
+            When(category=2, then=Value('요금 관련')),
+            default=Value('-')
+        )
+    ).values(
+        'id',
+        'category',
+        'category_display',
+        'create_time',
+        'auth_user__username',
+        'avg_accuracy_score',
+        'avg_kind_score',
+        'avg_solving_score',
+        'avg_add_score',
+        'avg_time_score',
+        'overall_avg_score'
+    )
 
     paginator = Paginator(data, 10)
     page = request.GET.get('page')
@@ -244,8 +306,8 @@ def quiz_history(request):
     퀴즈 이력
     '''
     # 검색 필터링 처리
-    search_text = request.GET.get("searchText", "")
     search_select = request.GET.get("searchSelect", "")
+    result = request.GET.get("result", "")
     
     start_date = request.GET.get("startDate", "")
     end_date = request.GET.get("endDate", "")
@@ -256,20 +318,13 @@ def quiz_history(request):
     if not request.user.is_superuser:
         query = Q(auth_user_id=request.user.id)
 
-    query1 = Q()
-    if search_text:
-        query1 = Q(auth_user__username__icontains=search_text)
-        query1 |= Q(auth_user__name__icontains=search_text)
-
     query2 = Q()
     if search_select:
         query2 = Q(category=search_select)
 
     query3 = Q()
     if result:
-        query3 = Q(is_passed=False)
-        if result == "pass":
-            query3 = Q(is_passed=True)
+        query3 = Q(is_passed=result)
 
     query4 = Q()
     if start_date and end_date:
@@ -291,7 +346,6 @@ def quiz_history(request):
     context = {
         'data': data,
         'searchSelect': search_select,
-        'searchText': search_text,
         'startDate': start_date,
         'endDate': end_date,
         'result': result,

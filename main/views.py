@@ -1,16 +1,19 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 from django.http import JsonResponse
 from accounts.models import User, CounselorProfile  
 from django.shortcuts import render, get_object_or_404, redirect
+
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ValidationError
 from django.contrib.auth.password_validation import validate_password
-from django.urls import reverse
 from management.models import Board
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
+from counseling.models import Log as CounselLog
+from education.models import Log as EducationLog, QuizHistory
+from django.db.models import Count, DateField
+from django.db.models.functions import Cast
 
 
 def user_dashboard(request):
@@ -20,6 +23,38 @@ def user_dashboard(request):
     notices = paginator.get_page(page)
     return render(request, 'main/index.html', {'notices': notices})
 
+
+def get_log_data(model_class, start, end, request_user_id=None):
+    queryset = model_class.objects.filter(create_time__gte=start, create_time__lte=end)\
+        .annotate(date=Cast('create_time', output_field=DateField()))\
+            .values('date')\
+                .annotate(count=Count('id'))\
+                    .order_by('date')
+    
+    if request_user_id is not None:
+        queryset = queryset.filter(auth_user=request_user_id)
+    
+    return [{'type': str(model_class), 'date': item['date'], 'count': item['count']} for item in queryset]
+
+
+def get_calendar(request, start, end):
+    start += " 00:00:00"
+    end += " 00:00:00"
+
+    if request.user.is_superuser:
+        counsel_data = get_log_data(CounselLog, start, end)
+        education_data = get_log_data(EducationLog, start, end)
+        quiz_data = get_log_data(QuizHistory, start, end)
+    else:
+        counsel_data = get_log_data(CounselLog, start, end, request.user.id)
+        education_data = get_log_data(EducationLog, start, end, request.user.id)
+        quiz_data = get_log_data(QuizHistory, start, end, request.user.id)
+    
+    data = counsel_data + education_data + quiz_data
+
+    return JsonResponse(data, safe=False)
+
+
 def notice_detail(request, id):
     notice = get_object_or_404(Board, id=id)
     is_image = False
@@ -27,22 +62,25 @@ def notice_detail(request, id):
         is_image = notice.file.url.lower().endswith(('.jpg', '.jpeg', '.png'))
     return render(request, 'main/notice_detail.html', {'notice': notice, 'is_image': is_image})
 
+
 def start_ezcs(request):
     return render(request, 'main/startezcs.html')
 
-@login_required
+
 def edit_profile(request):
     user = request.user
     profile = get_object_or_404(CounselorProfile, auth_user=user)  # 수정된 부분
 
+
     if request.method == 'POST':
         user.first_name = request.POST.get('name')
         user.email = request.POST.get('email') 
-        profile.phone_number = request.POST.get('phone_number')  # CounselorProfile 모델의 phone_number 필드 수정
-        profile.birth_date = request.POST.get('birth_date')  # CounselorProfile 모델의 birth_date 필드 수정
-        profile.address_code = request.POST.get('address_code')  # CounselorProfile 모델의 address_code 필드 수정
-        profile.address = request.POST.get('address')  # CounselorProfile 모델의 address 필드 수정
-        profile.address_detail = request.POST.get('address_detail')  # CounselorProfile 모델의 address_detail 필드 수정
+
+        profile.phone_number = request.POST.get('phone_number')
+        profile.birth_date = request.POST.get('birth_date')
+        profile.address_code = request.POST.get('address_code')
+        profile.address = request.POST.get('address')
+        profile.address_detail = request.POST.get('address_detail')
         password = request.POST.get('password')
         if password:
             try:
@@ -55,10 +93,12 @@ def edit_profile(request):
         profile.save()  
         return JsonResponse({'result': True, 'msg': '회원정보가 성공적으로 수정되었습니다.'})
 
-    return render(request, 'main/edit_profile.html', {'user': user, 'profile': profile})  # 프로필 정보 전달
+    return render(request, 'main/edit_profile.html', {'user': user, 'profile': profile})
+
 
 def contract(request):
     return render(request, 'main/contract.html')
+
 
 def privacy(request):
     return render(request, 'main/privacy.html')

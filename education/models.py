@@ -70,6 +70,41 @@ class LogItem(models.Model):
         , db_comment="Chatbot's evaluate message"
     )
 
+    accuracy_score = models.IntegerField(
+        null=True
+        , blank=True
+        , verbose_name="Chatbot's evaluate message Accuracy"
+        , db_comment="Chatbot's evaluate message Accuracy"
+    )
+    
+    kind_score = models.IntegerField(
+        null=True
+        , blank=True
+        , verbose_name="Chatbot's evaluate message Kind"
+        , db_comment="Chatbot's evaluate message Kind"
+    )
+
+    solving_score = models.IntegerField(
+        null=True
+        , blank=True
+        , verbose_name="Chatbot's evaluate message Problem-solving ability"
+        , db_comment="Chatbot's evaluate message Problem-solving ability"
+    )
+
+    add_score = models.IntegerField(
+        null=True
+        , blank=True
+        , verbose_name="Chatbot's evaluate message additional information"
+        , db_comment="Chatbot's evaluate message additional information"
+    )
+
+    time_score = models.IntegerField(
+        null=True
+        , blank=True
+        , verbose_name="Chatbot's evaluate message response time"
+        , db_comment="Chatbot's evaluate message response time"
+    )
+
     create_time = models.DateTimeField(
         auto_now_add=True
         , verbose_name="Created Time"

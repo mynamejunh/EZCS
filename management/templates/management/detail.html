@@ -28,18 +28,34 @@
             </tr>
             <tr>
                 <th>소속</th>
-                <td>{{ data.department }}</td>
+                <td>
+                    {% if data.department %}
+                    {{ data.department }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
             </tr>
             <tr>
                 <th>생년 월일</th>
-                <td>{{ data.birth_date }}</td>
+                <td>
+                    {% if data.birth_date %}
+                    {{ data.birth_date }}
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
             </tr>
             <tr>
                 <th>주소</th>
                 <td>
+                    {% if data.address_code %}
                     ({{ data.address_code }})
                     {{ data.address }}
                     {{ data.address_detail }}
+                    {% else %}
+                    -
+                    {% endif %}
                 </td>
             </tr>
             <tr>

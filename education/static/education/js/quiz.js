@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 "X-CSRFToken": formData.get("csrfmiddlewaretoken")
             }
         })
+        
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
@@ -87,3 +88,4 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 });
+

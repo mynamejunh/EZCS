@@ -175,6 +175,7 @@ ul>li {
 
 table {
     width: 100%;
+    text-align-last: center;
 }
 
 .styled-table thead tr {

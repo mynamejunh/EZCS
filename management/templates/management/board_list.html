@@ -17,7 +17,7 @@
         <table class="styled-table">
             <thead>
                 <th>순번</th>
-                <th>title</th>
+                <th>제목</th>
                 <th>일자</th>
                 <th>작성자</th>
             </thead>
@@ -36,15 +36,10 @@
                     </td>
                 </tr>
                 {% empty %}
-                <td>등록된 공지 사항이 없습니다.</td>
-                {% endfor %}
-
-                {% if boards %}
-                {% else %}
                 <tr>
-                    <td colspan="4">직원 요청 정보가 존재하지 않습니다.</td>
+                    <td colspan=4>등록된 공지 사항이 없습니다.</td>
                 </tr>
-                {% endif %}
+                {% endfor %}
             </tbody>
         </table>
     </div>

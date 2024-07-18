@@ -12,9 +12,8 @@ from django.contrib.auth import authenticate
 
 from counseling.models import Log as CounselLog
 from education.models import Log as EducationLog, QuizHistory
-from django.db.models import Count, DateField
-from django.db.models.functions import Cast
-
+from django.db.models.functions import TruncDate
+from django.db.models import Count
 
 def user_dashboard(request):
     notices = Board.objects.filter(flag=0).order_by('-create_time')

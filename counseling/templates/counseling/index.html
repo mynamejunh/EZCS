@@ -17,21 +17,6 @@
     }
 
 </script>
-<style>
-    .main-content {
-        display: block;
-    }
-
-    .all-div {
-        display: flex;
-        width: 100%;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        text-align-last: center;
-        height: fit-content;
-    }
-</style>
 <!-- 직원용 대시보드 내용 -->
 <input type="hidden" name="csrf" id="csrf" value="{{ csrf_token }}">
 <input type="hidden" name="url" id="url" value="{% url 'counseling:aiModel' %}">
@@ -52,40 +37,40 @@
 {% endif %}
 <div class="all-div" {% if request.method != 'POST' %}style="display: none !important;" {% endif %}>
     <div style="height: 100%; width: 30%;">
-        <div class="customer-info" style="height: 446px; max-height: 100vh;">
+        <div class="customer-info" style="height: 446px;">
             <h4>고객 정보</h4>
             <form id="customer-form" action="{% url 'counseling:updateLog' %}" style="text-align-last: left;">
                 <input type="hidden" name="customer-id" id="customer-id" value="{{ customer.id }}">
                 <table style="width: 100%; border-collapse: separate; border-spacing: 0 15px;">
                     <tbody>
                         <tr>
-                            <td>
+                            <td class="form-row">
                                 <label for="customer-name">고객명</label>
-                                <input type="text" id="customer-name" name="customer-name" value="{{ customer.name }}" style="margin-left: 16px;">
+                                <input type="text" id="customer-name" name="customer-name" value="{{ customer.name }}">
                             </td>
                         </tr>
                         <tr>
-                            <td>
+                            <td class="form-row">
                                 <label for="birthdate">생년월일</label>
                                 <input type="date" id="birthdate" name="birthdate" value="{{ customer.birth_date|date:'Y-m-d'}}">
                             </td>
                         </tr>
                         <tr>
-                            <td>
+                            <td class="form-row">
                                 <label for="phone">전화번호</label>
                                 <input type="tel" id="phone" name="phone" value="{{ customer.phone_number }}" maxlength="11" pattern="\d{3}\d{4}\d{4}">
                             </td>
                         </tr>
                         <tr>
-                            <td>
+                            <td class="form-row">
                                 <label for="join-date">가입일</label>
-                                <input type="date" id="join-date" name="join-date" value="{{ customer.joined_date|date:'Y-m-d' }}" style="margin-left: 15px;">
+                                <input type="date" id="join-date" name="join-date" value="{{ customer.joined_date|date:'Y-m-d' }}">
                             </td>
                         </tr>
                         <tr>
-                            <td colspan="3">
+                            <td class="form-row">
                                 <label for="address">주소</label>
-                                <input type="text" id="address" name="address" value="{{ customer.address }}" style="margin-left: 30px;">
+                                <input type="text" id="address" name="address" value="{{ customer.address }}">
                             </td>
                         </tr>
                     </tbody>
@@ -137,12 +122,12 @@
 
     <div style="height: 100%; width: 70%;">
         <div style="display: flex; height: 97%; width: 100%;">
-            <div class="stt-content" style="height: 709px; max-height: 100vh;">
+            <div class="stt-content">
                 <h4>고객-상담원</h4>
                 <div class="stt">
                     <div id="transcription">여기에 음성 입력 내용이 표시됩니다...</div>
-                    <div class="button-container" style="font-size: smaller;">
-                        <button id="customer-start-button" class="customer-mic-button" style="padding: 0px;" onclick="startCounseling('customer')">
+                    <div class="button-container">
+                        <button id="customer-start-button" class="customer-mic-button" onclick="startCounseling('customer')">
                             <i class="fas fa-microphone"></i> 고객 마이크 연결
                         </button>
                         <button id="counselor-start-button" class="mic-button" onclick="startCounseling('counselor')">
@@ -170,8 +155,6 @@
 </div>
 
 <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-<script src="{% static 'counseling/js/scripts.js' %}"></script>
-<script>window.username = "{{ username|safe }}";</script>
 <link rel="stylesheet" href="{% static 'counseling/css/styles.css' %}">
-
+<script>window.username = "{{ username|safe }}";</script>
 {% endblock %}

@@ -21,6 +21,7 @@
 
                 <div class="mb-3 my-form ">
                     <label for="name">ID</label>
+                    <label style="color: deepskyblue;">(필수)</label> 
                     <div class="username-input">
                         <div style="margin-right: 5px !important; width: 150% !important;">
                             <input type="text" class="form-control form-control-sm" id="loginUsername" name="loginUsername" maxlength="10" required onchange="nameChange(this);">
@@ -37,6 +38,7 @@
 
                 <div class="mb-3 my-form">
                     <label for="name">이름</label>
+                    <label style="color: deepskyblue;">(필수)</label>
                     <input type="text" class="form-control form-control-sm" id="name" name="name" maxlength="10" onblur="checkKoreanName(this);">
                     <div id="nameError" class="invalid-feedback"></div>
                 </div>
@@ -45,6 +47,7 @@
                 </div>
                 <div class="mb-3 my-form">
                     <label for="email">E-Mail</label>
+                    <label style="color: deepskyblue;">(필수)</label>
                     <div id="email" style="display: flex;">
                         <input type="email" class="form-control form-control-sm" id="emailLocal" name="emailLocal" maxlength="20" onblur="chkEmail();">
 
@@ -65,6 +68,7 @@
 
                 <div class="mb-3 my-form">
                     <label for="password">비밀번호</label>
+                    <label style="color: deepskyblue;">(필수)</label>
                     <input type="password" class="form-control form-control-sm" id="password" name="password" maxlength="64">
                 </div>
 
@@ -76,6 +80,7 @@
 
                 <div class="mb-3 my-form">
                     <label for="phone">전화 번호</label>
+                    <label style="color: deepskyblue;">(필수)</label>
                     <input type="text" class="form-control form-control-sm" id="phone" name="phone" maxlength="11" onblur="chkPhoneNumber();">
                     <div id="phoneError" class="invalid-feedback"></div>
                     <input type="hidden" name="phoneChk" id="phoneChk" value="">
@@ -100,6 +105,7 @@
 
                 <div class="mb-3 my-form" style="margin-top: 0.5rem;">
                     <label for="address" class="form-label">주소</label>
+                    <label style="color: deepskyblue;">(필수)</label>
                     <div class="col-sm-10 address" style="width: 98%;">
                         <input type="text" class="form-control form-control-sm mb-2" id="addressCode" name="addressCode" maxlength="10" placeholder="우편번호" style="width: 65%; display: inline-flex;" disabled>
                         <input type="button" id="zipp_btn" class="btn btn-sm btn-primary" onclick="execDaumPostcode()" value="우편번호 찾기">

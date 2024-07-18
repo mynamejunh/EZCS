@@ -137,10 +137,10 @@ h1 {
 }
 
 .submit-container {
-    padding: 20px;
+    /* padding: 20px; */
     margin-left: auto;
     display: flex;
-    justify-content: flex-end;
+    /* justify-content: flex-end; */
 }
 
 .submit-button, .end-button {
@@ -151,6 +151,7 @@ h1 {
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    text-decoration: none; /* 밑줄 제거 */
 }
 
 .end-button {

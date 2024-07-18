@@ -385,6 +385,13 @@ function signup() {
     if (!chkBirthdate()) {
         valid = false;
     }
+    
+    let addressCode = $("#addressCode").val();
+    if (!addressCode) {
+        alert("우편번호를 입력해 주세요.");
+        $("#addressCode").focus();
+        valid = false;
+    }
 
     let addressDetail = $("#addressDetail").val();
     if (!addressDetail) {

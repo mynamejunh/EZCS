@@ -87,6 +87,7 @@
                 </td>
             </tr>
             <tr>
+                {% if flag != 'ad' %}
                 <th>활동상태</th>
                 <td>
                     <input type="hidden" class="form-control form-control-sm" id="active_status" name="active_status" value="{{ user.active_status }}">
@@ -98,6 +99,7 @@
                         <option value="4" {% if user.active_status == 4 %}selected{% endif %}>Rejection</option>
                     </select>
                 </td>
+                {% endif %}  
             </tr>
         </tbody>
     </table>

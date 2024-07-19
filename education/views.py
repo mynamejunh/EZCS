@@ -41,6 +41,7 @@ def chat_view(request):
             output = chatbot.chat(message)
 
             evaluation_chatbot = Chatbot(
+
                 # model_id="gpt-4o",
                 category=category,
                 THRESHOLD=2,

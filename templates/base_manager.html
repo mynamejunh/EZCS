@@ -13,6 +13,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     {% load static %}
     <link href="{% static '/css/management.css' %}" rel="stylesheet" />
+    <link href="{% static 'management\css\login.css' %}" rel="stylesheet" />
     <script src="/static/js/management.js"></script>
     {% block extra_js %}{% endblock %}
     <script>
@@ -78,7 +79,7 @@
             </nav>
             {% endcomment %}
         </div>
-        <div class="content" style="margin-top: -20px;padding-top: 0px;">
+        <div class="content">
             <div class="main-content">
                 {% block content %}
                 <!-- 관리자 대시보드 내용 -->

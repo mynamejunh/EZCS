@@ -15,45 +15,37 @@
 <!-- 직원용 대시보드 내용 -->
 <div class="all-div">
     <div style="height: 100%; width: 30%;">
-        <div class="customer-info" style="height: 446px; max-height: 100vh;">
+        <div class="customer-info" style="height: 446px;">
             <h4>고객 정보</h4>
             <form id="customer-form" style="text-align-last: left;">
                 <table style="width: 100%; border-collapse: separate; border-spacing: 0 15px;">
                     <tbody>
                         <tr>
-                            <td>
+                            <td class="form-row">
                                 <label for="customer-name">고객명</label>
+                                <span>{{ head.customer.name }}</span>
                             </td>
-                            <td>
-                                <span style="margin-left: 16px;">{{ head.customer.name }}</span>
-                            </td>
-                            <td>
+                        <tr>
+                            <td class="form-row">
                                 <label for="birthdate">생년월일</label>
-                            </td>
-                            <td>
-                                <span style="margin-left: 15px;">{{ head.customer.birth_date }}</span>
+                                <span>{{ head.customer.birth_date }}</span>
                             </td>
                         </tr>
                         <tr>
-                            <td>
+                            <td class="form-row">
                                 <label for="phone">전화번호</label>
-                            </td>
-                            <td>
                                 {{ head.customer.phone_number }}
                             </td>
-                            <td>
+                        <tr>
+                            <td class="form-row">
                                 <label for="join-date">가입일</label>
-                            </td>
-                            <td>
-                                <span style="margin-left: 15px;">{{ head.customer.joined_date }}</span>
+                                <span>{{ head.customer.joined_date }}</span>
                             </td>
                         </tr>
                         <tr>
-                            <td>
+                            <td class="form-row">
                                 <label for="address">주소</label>
-                            </td>
-                            <td colspan="3">
-                                <span style="margin-left: 30px;">{{ head.customer.address }}</span>
+                                <span>{{ head.customer.address }}</span>
                             </td>
                         </tr>
                     </tbody>
@@ -145,7 +137,7 @@
 <div>
     <form action="{% url 'counseling:counsel' %}" method="get">
         <button id="save-button" type="button" class="submit-button" onclick="history.back();">
-            <i class="fas fa-save"></i> 뒤로가기
+            <i class="fas fa-save"></i> 돌아가기
         </button>
     </form>
 </div>

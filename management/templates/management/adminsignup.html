@@ -24,7 +24,7 @@
                 <div class="mb-3 my-form ">
                     <label for="name">ID</label>
                     <div class="username-input">
-                        <div style="margin-right: 5px !important; width: 150% !important;">
+                        <div style="margin-right: 5px !important; width: 95% !important;">
                             <input type="text" class="form-control form-control-sm" id="loginUsername" name="loginUsername" maxlength="10" required onchange="nameChange(this);">
                             <div id="usernameVaild" class="valid-feedback"></div>
                             <div id="usernameError" class="invalid-feedback"></div>
@@ -113,18 +113,13 @@
                 </div>
 
                 <hr class="mb-4">
-
-                <div class="custom-control custom-checkbox">
-                    <input type="checkbox" class="custom-control-input" id="aggrement" required>
-                    <label class="custom-control-label" for="aggrement">개인정보 수집 및 이용에 동의합니다.</label>
-                </div>
                 <div style="text-align: center;">
                     <input type="button" value="관리자 생성" class="btn btn-outline-primary" onclick="signup()">
                     <!-- </div> -->
                 </div>
                 <div>
                     <p>
-                        <a href="{% url 'management:list' flag='ad' %}"> 뒤로가기</a>
+                        <a href="{% url 'management:list' flag='ad' %}"> 돌아가기</a>
                     </p>
                 </div>
             </form>

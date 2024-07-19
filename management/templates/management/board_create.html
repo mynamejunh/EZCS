@@ -6,7 +6,7 @@
 <h2>공지 사항 작성</h2>
 <form method="post" action="{% url 'management:board_create' %}" enctype="multipart/form-data">
     {% csrf_token %}
-    <table class="styled-table-deail">
+    <table class="styled-table-deail" style="text-align-last: auto;">
         <tbody>
             <tr>
                 <th>제목</th>
@@ -17,7 +17,7 @@
             <tr>
                 <th>내용</th>
                 <td>
-                    <div id="editor-container"></div>
+                    <div id="editor-container" style="height: 20vh;"></div>
                     <input type="hidden" id="body" name="body" required>
                 </td>
             </tr>

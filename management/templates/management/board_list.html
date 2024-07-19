@@ -2,22 +2,55 @@
 {% block title %}공지사항 목록{% endblock %}
 
 {% block content %}
-
+<script>
+    window.onkeydown = function () {
+        var kcode = event.keyCode;
+        if (kcode == 116) {
+            history.replaceState({}, null, location.pathname);
+        }
+    }
+</script>
 <div class="dashboard">
     <div>
-        <h2>공지 사항 목록</h2>
+        <h2 style="font-weight: bold;">공지 사항 목록</h2>
     </div>
     <div>
-        <a href="{% url 'management:board_create' %}" class="btn btn-primary mb-3" style="float: right;">공지 사항 작성</a>
+        <a href="{% url 'management:board_create' %}" class="btn btn-primary mb-3" style="float: right; margin-top: 10px;">공지 사항 작성</a>
+    </div>
+    <div>
+        <ul>
+            <li>
+                <select name="searchSelect" id="searchSelect" class="form-control" style="cursor: pointer;">
+                    <option value="0" {% if searchSelect == '0' %}selected{% endif %}>전체</option>
+                    <option value="1" {% if searchSelect == '1' %}selected{% endif %}>작성자</option>
+                    <option value="2" {% if searchSelect == '2' %}selected{% endif %}>제목</option>
+                </select>
+            </li>
+            <li><input type="text" class="form-control" style="width: 450px; height: 38px;" id="searchText" name="searchText" placeholder="검색창" value="{{ searchText }}"></li>
+            <li><span class="form-control my-span">작성 일자</span></li>
+            <li>
+                <input type="date" id="startDate" name="startDate" class="form-control" style="width: 200px; text-align: center;" value="{{ startDate }}" onkeydown="return false">
+            </li>
+            <li><span class="form-control my-span">~</span></li>
+            <li>
+                <input type="date" id="endDate" name="endDate" class="form-control" style="width: 200px; text-align: center;" value="{{ endDate }}" onkeydown="return false">
+            </li>
+            <li><input type="submit" class="btn btn-primary" value="검색"></li>
+        </ul>
     </div>
     <div>
         <span style="float: left;">총 {{ boards|length }}건</span>
     </div>
     <div>
         <table class="styled-table">
+            <colgroup>
+                <col width="5%">
+                <col width="35%">
+                <col width="15%">
+            </colgroup>
             <thead>
                 <th>순번</th>
-                <th>title</th>
+                <th>제목</th>
                 <th>일자</th>
                 <th>작성자</th>
             </thead>
@@ -36,17 +69,29 @@
                     </td>
                 </tr>
                 {% empty %}
-                <td>등록된 공지 사항이 없습니다.</td>
-                {% endfor %}
-
-                {% if boards %}
-                {% else %}
                 <tr>
-                    <td colspan="4">직원 요청 정보가 존재하지 않습니다.</td>
+                    <td colspan=4>등록된 공지 사항이 없습니다.</td>
                 </tr>
-                {% endif %}
+                {% endfor %}
             </tbody>
         </table>
+    </div>
+</div>
+<div class="pagination">
+    <div class="step-links">
+        {% if data.has_previous %}
+        <a href="?page=1">&laquo; 처음</a>
+        <a href="?page={{ data.previous_page_number }}">이전</a>
+        {% endif %}
+
+        <span class="current">
+            페이지 {{ data.number }} / {{ data.paginator.num_pages }}
+        </span>
+
+        {% if data.has_next %}
+        <a href="?page={{ data.next_page_number }}">다음</a>
+        <a href="?page={{ data.paginator.num_pages }}">마지막 &raquo;</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

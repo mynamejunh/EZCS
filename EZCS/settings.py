@@ -166,7 +166,7 @@ LOGGING = {
     }
 }
 
-CSRF_TRUSTED_ORIGINS = ['https://5832-59-26-32-139.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['https://db03-59-26-32-139.ngrok-free.app']
 # CSRF_TRUSTED_ORIGINS = ['http://13.125.209.92']
 
 CSRF_COOKIE_SECURE = True

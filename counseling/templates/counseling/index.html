@@ -16,7 +16,13 @@
         }
     }
 </script>
-
+<style>
+    .save-button {
+        padding: 10px; /* 버튼 컨테이너에 약간의 패딩을 추가합니다 */
+        background-color: #f8f8f8; /* 버튼 컨테이너의 배경색을 설정합니다 */
+        border-top: 1px solid #ddd; /* 버튼 컨테이너의 상단에 테두리를 추가합니다 */
+    }
+</style>
 <!-- 직원용 대시보드 내용 -->
 <input type="hidden" name="csrf" id="csrf" value="{{ csrf_token }}">
 <input type="hidden" name="url" id="url" value="{% url 'counseling:aiModel' %}">
@@ -37,7 +43,7 @@
 {% endif %}
 <div class="all-div" {% if request.method != 'POST' %}style="display: none !important;" {% endif %}>
     <div style="height: 100%; width: 30%;">
-        <div class="customer-info" style="height: 446px;">
+        <div class="customer-info" style="height: 446px;" >
             <h4>고객 정보</h4>
             <form id="customer-form" action="{% url 'counseling:updateLog' %}" style="text-align-last: left;">
                 <input type="hidden" name="customer-id" id="customer-id" value="{{ customer.id }}">
@@ -139,7 +145,7 @@
                     </div>
                 </div>
             </div>
-            <div class="stt-content" style="height: 709px; max-height: 100vh;">
+            <div class="stt-content">
                 <h4>고객음성번역-챗봇추천응대멘트</h4>
                 <div class="translation">
                     <div id="translation-content">여기에 번역된 내용이 표시됩니다...</div>

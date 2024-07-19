@@ -175,7 +175,16 @@ ul>li {
 
 table {
     width: 100%;
+    /* text-align-last: center; */
+
+}
+
+.styled-table {
     text-align-last: center;
+}
+
+.styled-table-deail {
+    width: 100%;
 }
 
 .styled-table thead tr {
@@ -253,3 +262,7 @@ table {
     border-color: #2c3e50 !important;
 }
 
+.content {
+    margin-top: -20px;
+    padding-top: 0px;
+}

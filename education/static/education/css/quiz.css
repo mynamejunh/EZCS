@@ -143,6 +143,13 @@ h1 {
     /* justify-content: flex-end; */
 }
 
+.submit-container-quiz {
+    /* padding: 20px; */
+    margin-left: auto;
+    display: flex;
+    justify-content: flex-end;
+}
+
 .submit-button, .end-button {
     padding: 10px 20px;
     font-size: 16px;

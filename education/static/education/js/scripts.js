@@ -1,5 +1,11 @@
 let lastChatbotMessage = "";
 const loadingDiv = document.querySelector(".loading");
+// 시작 및 중지 버튼, 채팅 내용을 가져오는 변수
+const startButton = document.getElementById("start-button");
+const stopButton = document.getElementById("stop-button");
+const chatContent = document.getElementById("chat-content");
+let mediaRecorder;
+let audioChunks = [];
 
 // DOM 콘텐츠가 완전히 로드되면 이 함수를 실행
 document.addEventListener("DOMContentLoaded", function () {
@@ -11,6 +17,9 @@ document.addEventListener("DOMContentLoaded", function () {
             sendMessage(event);
         }
     });
+    if (getCookie("soundOnOff") == "true") {
+        $("#soundOnOff").prop("checked", true);
+    }
 });
 
 // 카테고리를 선택하는 함수
@@ -49,7 +58,7 @@ function selectCategory(category) {
             document.getElementById("selected-category").innerText = category;
             document.getElementById("chat-content").innerHTML = ""; // 채팅 내용을 지움
             appendMessage("bot", data.initial_question); // 첫 질문 출력
-            textToSpeech(data.initial_question);
+            if ($("#soundOnOff").is(":checked")) textToSpeech(data.initial_question);
 
             windowChange(true);
         })
@@ -62,6 +71,7 @@ function selectCategory(category) {
 
 // 메시지를 전송하는 함수
 function sendMessage(event) {
+    beforeFetch();
     event.preventDefault();
     const message = document.getElementById("question").value;
     if (!message.trim()) return;
@@ -90,16 +100,18 @@ function sendMessage(event) {
             appendMessage("bot", data.response);
             // lastChatbotMessage = data.response;
             removeMessageInterimDiv();
-            textToSpeech(data.response);
+            if ($("#soundOnOff").is(":checked")) textToSpeech(data.response);
 
             if (data.output) {
                 const childDiv = document.createElement("div");
                 childDiv.className = "evaluated-message-bot";
                 childDiv.innerText = data.output;
                 document.getElementById("readonly-chat-content").appendChild(childDiv);
+                document.getElementById("readonly-chat-content").scrollTop = document.getElementById("readonly-chat-content").scrollHeight;
             } else if (data.error) {
                 console.error("Error from server:", data.error);
             }
+            afterFetch();
         })
         .catch((error) => {
             removeMessageInterimDiv();
@@ -122,16 +134,25 @@ function appendMessage(sender, message) {
     }
 }
 
-// 시작 및 중지 버튼, 채팅 내용을 가져오는 변수
-const startButton = document.getElementById("start-button");
-const stopButton = document.getElementById("stop-button");
-const chatContent = document.getElementById("chat-content");
-let mediaRecorder;
-let audioChunks = [];
+function beforeFetch() {
+    // fetch 요청 전에 실행되는 로직
+    $("#question").attr("disabled", true);
+    $("#text-button").attr("disabled", true);
+    startButton.disabled = true;
+    stopButton.disabled = true;
+}
+
+function afterFetch() {
+    // fetch 요청이 완료된 후 실행되는 로직
+    $("#question").attr("disabled", false);
+    $("#text-button").attr("disabled", false);
+    startButton.disabled = false;
+    stopButton.disabled = true;
+}
 
 // 롤플레잉 시작 함수
 function startEducation() {
-    $("#question").attr("readonly", true);
+    $("#question").attr("disabled", true);
     $("#text-button").attr("disabled", true);
 
     navigator.mediaDevices
@@ -199,6 +220,7 @@ function startEducation() {
                 console.log("Education ended");
 
                 if (finalTranscript.trim() !== "") {
+                    beforeFetch();
                     const finalDiv = createFinalDiv(finalTranscript);
                     chatContent.appendChild(finalDiv);
                     appendMessage("interim", "AI가 메시지를 생성중입니다  <div class='spinner-grow spinner-grow-sm' role='status'></div>");
@@ -222,14 +244,16 @@ function startEducation() {
                             removeMessageInterimDiv();
                             appendMessage("bot", data.response);
                             if (data.output) {
-                                textToSpeech(data.response);
+                                if ($("#soundOnOff").is(":checked")) textToSpeech(data.response);
                                 const childDiv = document.createElement("div");
                                 childDiv.className = "evaluated-message-bot";
                                 childDiv.innerText = data.output;
                                 document.getElementById("readonly-chat-content").appendChild(childDiv);
+                                document.getElementById("readonly-chat-content").scrollTop = document.getElementById("readonly-chat-content").scrollHeight;
                             } else if (data.error) {
                                 console.error("Error from server:", data.error);
                             }
+                            afterFetch();
                         })
                         .catch((error) => {
                             console.error("Error:", error);
@@ -255,7 +279,7 @@ function startEducation() {
 
 // 롤플레잉 종료 함수
 function stopEducation() {
-    $("#question").attr("readonly", false);
+    $("#question").attr("disabled", false);
     $("#text-button").attr("disabled", false);
     if (window.recognition) {
         window.recognition.stop();
@@ -349,7 +373,20 @@ function textToSpeech(text) {
     utterance.rate = 2;
     speechSynthesis.speak(utterance);
 
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener("beforeunload", () => {
         speechSynthesis.cancel();
     });
+}
+
+function soundChange(obj) {
+    document.cookie = "soundOnOff=" + $(obj).is(":checked") + "; path=/";
+
+    if (!$(obj).is(":checked")) {
+        speechSynthesis.cancel();
+    }
+}
+
+function getCookie(name) {
+    let matches = document.cookie.match(new RegExp("(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1") + "=([^;]*)"));
+    return matches ? decodeURIComponent(matches[1]) : undefined;
 }

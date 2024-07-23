@@ -68,11 +68,13 @@
                 </li>
             </ul>
         </div>
+        {% if not request.user.is_superuser %}
         <div>
             <ul class="menu">
                 <li><a href="#" id="profileLink">내 정보</a></li>
             </ul>
         </div>
+        {% endif %}
     </div>
     <div class="content">
         <div class="header">

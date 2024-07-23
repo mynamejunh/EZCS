@@ -186,7 +186,7 @@ table {
     text-align-last: center;
 }
 
-.styled-table-deail {
+.styled-table-detail {
     width: 100%;
 }
 
@@ -272,4 +272,9 @@ table {
     flex-direction: column;
     min-height: 100vh;
     flex: 1;
+}
+
+.styled-table-deail tbody tr th {
+    width: 12.3%;
+
 }

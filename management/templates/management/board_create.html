@@ -3,28 +3,28 @@
 {% block title %}공지 사항 작성{% endblock %}
 
 {% block content %}
-<h2>공지 사항 작성</h2>
+<h2 style="font-weight: bold;">공지 사항 작성</h2>
 <form method="post" action="{% url 'management:board_create' %}" enctype="multipart/form-data">
     {% csrf_token %}
-    <table class="styled-table-deail" style="text-align-last: auto;">
+    <table class="styled-table-deail">
         <tbody>
             <tr>
                 <th>제목</th>
                 <td>
-                    <input type="text" class="form-control" name="title" required>
+                    <input type="text" class="form-control" name="title" required style="width: 100%;">
                 </td>
             </tr>
             <tr>
                 <th>내용</th>
                 <td>
-                    <div id="editor-container" style="height: 20vh;"></div>
+                    <div id="editor-container" style="height: 20vh; text-align-last: left; font-size: 20px; width: 100%; word-wrap: break-word; word-break: break-all;"></div>
                     <input type="hidden" id="body" name="body" required>
                 </td>
             </tr>
             <tr>
                 <th>상태</th>
                 <td>
-                    <select class="form-control" name="flag" required>
+                    <select class="form-control" name="flag" required style="width: 100%;">
                         <option value="0">활성화</option>
                         <option value="1">비활성화</option>
                     </select>
@@ -33,7 +33,7 @@
             <tr>
                 <th>파일</th>
                 <td>
-                    <input type="file" class="form-control" name="file" accept=".jpg, .jpeg, .png">
+                    <input type="file" class="form-control" name="file" accept=".jpg, .jpeg, .png" style="width: 100%;">
                     <small class="form-text text-muted">jpg, jpeg, png 파일만 업로드 가능합니다.</small>
                     {% if error %}
                     <div style="color: red;">{{ error }}</div>

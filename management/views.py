@@ -7,6 +7,8 @@ from .models import Board
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
+from bs4 import BeautifulSoup
+
 
 def board_delete(request, id):
     board = get_object_or_404(Board, id=id)
@@ -64,11 +66,8 @@ def list(request, flag):
 
     query2 = Q()
     if start_date and end_date:
-        start_date = datetime.strptime(start_date, '%Y-%m-%d')
-        end_date = datetime.strptime(end_date, '%Y-%m-%d')
-        
-        query2 &= Q(auth_user__date_joined__gte=start_date)
-        query2 &= Q(auth_user__date_joined__lte=end_date)
+        query2 &= Q(auth_user__date_joined__gte=start_date+" 00:00:00")
+        query2 &= Q(auth_user__date_joined__lte=end_date+" 23:59:59")
     else:
         one_month_ago = datetime.now() - timedelta(days=365)
         query2 &= Q(auth_user__date_joined__gte=one_month_ago)
@@ -128,8 +127,62 @@ def board_create(request):
     return render(request, 'management/board_create.html')
 
 def board_list(request):
-    boards = Board.objects.all()
-    return render(request, 'management/board_list.html', {'boards': boards})
+    search_select = request.GET.get("searchSelect", "")
+    search_text = request.GET.get("searchText", "")
+    start_date = request.GET.get("startDate", "")
+    end_date = request.GET.get("endDate", "")
+
+    search_query = Q()
+    if search_select:
+        valid_fields = {
+            '0': 'title__icontains',
+            '1': 'body__icontains',
+            '2': 'auth_user__first_name__icontains',
+        }
+
+        if search_select == 'all':
+            for val in valid_fields.values():
+                search_query |= Q(**{val: search_text})
+        else:
+            search_field = valid_fields[search_select]
+            search_query = Q(**{search_field: search_text})
+
+    date_query = Q()
+    if start_date and end_date:
+        date_query &= Q(update_time__gte=start_date+" 00:00:00")
+        date_query &= Q(update_time__lte=end_date+" 23:59:59")
+    else:
+        one_month_ago = datetime.now() - timedelta(days=30)
+        date_query &= Q(update_time__gte=one_month_ago)
+        date_query &= Q(update_time__lte=datetime.now())
+        start_date = one_month_ago.strftime('%Y-%m-%d')
+        end_date = datetime.now().strftime('%Y-%m-%d')
+
+    data = Board.objects.filter(search_query & date_query)
+    
+    paginator = Paginator(data, 10)
+    page = request.GET.get('page')
+    data = paginator.get_page(page)
+    
+    for item in data:
+        item.masked_name = mask_name(item.auth_user.first_name)
+        soup = BeautifulSoup(item.body, 'html.parser')
+        text = soup.get_text()
+        item.body = text
+        if len(text) > 10:
+            item.body = text[:10]
+            item.body += "..."
+
+    context = {
+        'data': data,
+        'searchSelect': search_select,
+        'searchText': search_text,
+        'startDate': start_date,
+        'endDate': end_date,
+        'is_paginated': data.has_other_pages(),
+    }
+
+    return render(request, 'management/board_list.html', context)
 
 def board_detail(request, id):
     board = get_object_or_404(Board, id=id)

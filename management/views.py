@@ -20,9 +20,10 @@ def validate_image(file):
 
 
 def mask_name(full_name):
-    if len(full_name) > 1:
+    if len(full_name) <= 2:
         return full_name[:-1] + '*'
-    return full_name
+    else:
+        return full_name[0] + '*' * (len(full_name) - 2) + full_name[-1]
     
 def list(request, flag):
     search_select = request.GET.get("searchSelect", "")

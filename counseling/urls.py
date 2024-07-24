@@ -14,6 +14,7 @@ urlpatterns = [
 
     path("detail/<int:id>/", views.detail, name="detail"),
 
+    path("delCounselData/", views.delete_counseling_init_data, name="delCounselData"),
 
 
 

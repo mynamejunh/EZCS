@@ -2,25 +2,14 @@
 {% load static %}
 {% block title %}AI 상담{% endblock %}
 {% block content %}
-<script>
-    window.onkeydown = function () {
-        if ($("#requestMethod").val() == 'POST') {
-            var kcode = event.keyCode;
-            if (kcode == 116) { // F5 key
-                event.preventDefault();
-                if (confirm('새로 고침 시 상담이 종료됩니다. 그래도 하시겠습니까?')) {
-                    history.replaceState({}, null, location.pathname);
-                    location.reload();
-                }
-            }
-        }
-    }
-</script>
 <style>
     .save-button {
-        padding: 10px; /* 버튼 컨테이너에 약간의 패딩을 추가합니다 */
-        background-color: #f8f8f8; /* 버튼 컨테이너의 배경색을 설정합니다 */
-        border-top: 1px solid #ddd; /* 버튼 컨테이너의 상단에 테두리를 추가합니다 */
+        padding: 10px;
+        /* 버튼 컨테이너에 약간의 패딩을 추가합니다 */
+        background-color: #f8f8f8;
+        /* 버튼 컨테이너의 배경색을 설정합니다 */
+        border-top: 1px solid #ddd;
+        /* 버튼 컨테이너의 상단에 테두리를 추가합니다 */
     }
 </style>
 <!-- 직원용 대시보드 내용 -->
@@ -28,6 +17,7 @@
 <input type="hidden" name="url" id="url" value="{% url 'counseling:aiModel' %}">
 <input type="hidden" name="logId" id="logId" value="{{ logId }}">
 <input type="hidden" name="requestMethod" id="requestMethod" value="{{ request.method }}">
+<input type="hidden" name="delUrl" id="delUrl" value="{% url 'counseling:delCounselData' %}">
 {% if request.method != 'POST' %}
 <div class="all-div" style="height: 69vh;">
     <form action="{% url 'counseling:counsel' %}" method="post">
@@ -43,7 +33,7 @@
 {% endif %}
 <div class="all-div" {% if request.method != 'POST' %}style="display: none !important;" {% endif %}>
     <div style="height: 100%; width: 30%;">
-        <div class="customer-info" style="height: 446px;" >
+        <div class="customer-info" style="height: 446px;">
             <h4>고객 정보</h4>
             <form id="customer-form" action="{% url 'counseling:updateLog' %}" style="text-align-last: left;">
                 <input type="hidden" name="customer-id" id="customer-id" value="{{ customer.id }}">

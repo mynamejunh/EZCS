@@ -21,4 +21,6 @@ urlpatterns = [
 
     # 퀴즈 이력 상세페이지
     path('quiz_details/<int:log_id>/', views.quiz_details, name='quiz_details'),
+
+    path('del_train_data', views.delete_training_init_data, name='delTrainData'),
 ]

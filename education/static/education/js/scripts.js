@@ -7,6 +7,32 @@ const chatContent = document.getElementById("chat-content");
 let mediaRecorder;
 let audioChunks = [];
 
+function BeforeUnloadFunc(event) {
+    var count = $("#chat-content > div").length;
+    if (count > 1) {
+        event.preventDefault();
+        event.returnValue = "";
+        return "";
+    } else {
+        let param = { id: $("#log-header").val() };
+        $.ajax({
+            url: $("#delUrl").val(),
+            type: "POST",
+            data: param,
+            dataType: "json",
+            headers: {
+                "X-CSRFToken": $("#csrf").val()
+            },
+            success: function (data) {},
+            error: function (xhr, status, error) {
+                console.log("Error:", error);
+                alert("ERROR");
+                return;
+            }
+        });
+    }
+}
+
 // DOM 콘텐츠가 완전히 로드되면 이 함수를 실행
 document.addEventListener("DOMContentLoaded", function () {
     // 아이디가 "question"인 요소에 키다운 이벤트 리스너 추가
@@ -61,6 +87,7 @@ function selectCategory(category) {
             if ($("#soundOnOff").is(":checked")) textToSpeech(data.initial_question);
 
             windowChange(true);
+            window.addEventListener("beforeunload", BeforeUnloadFunc);
         })
         .catch((error) => {
             console.error("Error:", error);

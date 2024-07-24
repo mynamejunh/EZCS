@@ -7,6 +7,39 @@ let currentStream;
 let audioBlob;
 let currentInterimDiv;
 
+$(document).ready(function () {
+    if ($("#requestMethod").val() === "POST") {
+        window.addEventListener("beforeunload", BeforeUnloadFunc);
+    }
+});
+
+function BeforeUnloadFunc(event) {
+    var count = $("#transcription > div").length;
+    console.log(count);
+    if (count > 0) {
+        event.preventDefault();
+        event.returnValue = "";
+        return "";
+    } else {
+        let param = { id: $("#logId").val() };
+        $.ajax({
+            url: $("#delUrl").val(),
+            type: "POST",
+            data: param,
+            dataType: "json",
+            headers: {
+                "X-CSRFToken": $("#csrf").val()
+            },
+            success: function (data) {},
+            error: function (xhr, status, error) {
+                console.log("Error:", error);
+                alert("ERROR");
+                return;
+            }
+        });
+    }
+}
+
 function updateLog() {
     let phone_number = $("#phone").val();
     if (phone_number.length !== 11 || !/^\d{11}$/.test(phone_number)) {
@@ -211,7 +244,6 @@ function stopCounseling() {
 
 function loadAIMessages(classify, message) {
     if (classify === "customer") appendAILoading();
-
 
     const formData = new FormData();
     formData.append("classify", classify);

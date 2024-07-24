@@ -8,6 +8,7 @@
 <input type="hidden" name="csrf" id="csrf" value="{{ csrf_token }}">
 <input type="hidden" name="log-header" id="log-header" value="">
 <input type="hidden" name="category-selected" id="category-selected" value="">
+<input type="hidden" name="delUrl" id="delUrl" value="{% url 'education:delTrainData' %}">
 
 <div class="loading" style="display: none;">
     <img src="/static/main/images/loading.gif" />

@@ -1,27 +1,27 @@
-from django.shortcuts import render
-from django.http import JsonResponse
+import random
+import json
+import logging
+
 from chat import Chatbot
 from chat_trans import Chatbot_trans
-from django.views.decorators.csrf import csrf_exempt
-import logging
-from .models import *
-from django.db.models import Q
-import json
-from django.core.paginator import Paginator
-import random
-from django.conf import settings
-from datetime import datetime, timedelta
-from abuse_filter import AbuseFilter
 from prompt import Prompt
 
+from datetime import datetime, timedelta
+
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+from abuse_filter import AbuseFilter
+from .models import *
 
 
 logger = logging.getLogger(__name__)
 abuse_filter = AbuseFilter()
 
-
 prompt = Prompt()
-
 
 trans_chat_bot = None
 recommend_chat_bot = None
@@ -151,12 +151,10 @@ def history(request):
 
     query2 = Q()
     if start_date and end_date:
-        query2 &= Q(create_time__gte=start_date+" 00:00:00")
-        query2 &= Q(create_time__lte=end_date+" 23:59:59")
+        query2 = Q(create_time__range=[start_date+" 00:00:00", end_date+" 23:59:59"])
     else:
         one_month_ago = datetime.now() - timedelta(days=30)
-        query2 &= Q(create_time__gte=one_month_ago)
-        query2 &= Q(create_time__lte=datetime.now())
+        query2 = Q(create_time__range=[one_month_ago, datetime.now()])
         start_date = one_month_ago.strftime("%Y-%m-%d")
         end_date = datetime.now().strftime("%Y-%m-%d")
 
@@ -169,7 +167,6 @@ def history(request):
     for log in data:
         log.masked_name = mask_name(log.customer.name)
 
-        
     context = {
         "data": data,
         "searchSelect": search_select,
@@ -178,6 +175,7 @@ def history(request):
         "endDate": end_date,
         "is_paginated": data.has_other_pages(),
     }
+
     return render(request, "counseling/history.html", context)
 
 
@@ -192,11 +190,9 @@ def list(request):
     customer = CustomerProfile.objects.order_by("?").first()
 
     if customer:
-        # 선택된 고객의 상담 기록을 모두 가져오기
         log = Log.objects.filter(customer=customer)
 
         if log:
-            # 랜덤으로 상담 기록 중 하나를 선택
             random_counsel_log = random.choice(log)
 
             try:
@@ -249,11 +245,6 @@ def save_counseling_log(request):
 
             chat_data = json.dumps(data.get("chat_data", {}), ensure_ascii=False)
             memo_data = json.dumps(data.get("memo_data", {}), ensure_ascii=False)
-
-            print(f"Username: {username}")
-            print(f"Phone Number: {phone_number}")
-            print(f"Chat Data: {chat_data}")
-            print(f"Memo Data: {memo_data}")
 
             counselLog = Log(
                 username=username,
@@ -335,3 +326,12 @@ def save_consultation(request):
         except Exception as e:
             return JsonResponse({"success": False, "error": str(e)})
     return JsonResponse({"success": False, "error": "Invalid request"})
+
+
+def delete_counseling_init_data(request):
+    if request.method == "POST":
+        id = request.POST.get('id')
+        LogItem.objects.filter(log=id).delete()
+        Log.objects.filter(id=id).delete()
+        return JsonResponse({"response": "True"})
+    return JsonResponse({"response": "False"})

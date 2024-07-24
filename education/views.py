@@ -156,16 +156,15 @@ def edu_history(request):
 
     query3 = Q()
     if start_date and end_date:
-        query3 &= Q(create_time__gte=start_date+" 00:00:00")
-        query3 &= Q(create_time__lte=end_date+" 23:59:59")
+        query3 = Q(create_time__range=[start_date+" 00:00:00", end_date+" 23:59:59"])
     else:
         one_month_ago = datetime.now() - timedelta(days=30)
-        query3 &= Q(create_time__gte=one_month_ago)
-        query3 &= Q(create_time__lte=datetime.now())
+        query3 = Q(create_time__range=[one_month_ago, datetime.now()])
         start_date = one_month_ago.strftime('%Y-%m-%d')
         end_date = datetime.now().strftime('%Y-%m-%d')
 
     data = Log.objects.filter(query & query2 & query3).order_by('-create_time', 'category')
+    
     data = data.annotate(
         avg_accuracy_score=Round(Avg('education_log_items__accuracy_score'), 2),
         avg_kind_score=Round(Avg('education_log_items__kind_score'), 2),
@@ -198,7 +197,7 @@ def edu_history(request):
         'avg_time_score',
         'overall_avg_score'
     )
-
+    
     # 데이터에서 None 값을 가지는 항목 제거
     filtered_data = []
     for item in data:
@@ -346,12 +345,10 @@ def quiz_history(request):
 
     query4 = Q()
     if start_date and end_date:
-        query4 &= Q(create_time__gte=start_date)
-        query4 &= Q(create_time__lte=end_date)
+        query4 = Q(create_time__range=[start_date+" 00:00:00", end_date+" 23:59:59"])
     else:
         one_month_ago = datetime.now() - timedelta(days=30)
-        query4 &= Q(create_time__gte=one_month_ago)
-        query4 &= Q(create_time__lte=datetime.now())
+        query4 = Q(create_time__range=[one_month_ago, datetime.now()])
         start_date = one_month_ago.strftime('%Y-%m-%d')
         end_date = datetime.now().strftime('%Y-%m-%d')
 
@@ -384,3 +381,12 @@ def quiz_details(request, log_id):
         , 'data': data
     }
     return render(request, 'education/quiz_details.html', context)
+
+
+def delete_training_init_data(request):
+    if request.method == "POST":
+        id = request.POST.get('id')
+        LogItem.objects.filter(log=id).delete()
+        Log.objects.filter(id=id).delete()
+        return JsonResponse({"response": "True"})
+    return JsonResponse({"response": "False"})

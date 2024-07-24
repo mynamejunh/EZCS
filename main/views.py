@@ -1,19 +1,18 @@
-from django.shortcuts import render
-from django.http import JsonResponse
-from accounts.models import User, CounselorProfile  
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.hashers import make_password
-from django.core.exceptions import ValidationError
-from django.contrib.auth.password_validation import validate_password
-from management.models import Board
-from django.core.paginator import Paginator
-from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate
-
-from counseling.models import Log as CounselLog
-from education.models import Log as EducationLog, QuizHistory
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.core.paginator import Paginator
 from django.db.models import Count, DateField
 from django.db.models.functions import Cast
+from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.decorators.csrf import csrf_exempt
+
+from accounts.models import CounselorProfile  
+from counseling.models import Log as CounselLog
+from education.models import Log as EducationLog, QuizHistory
+from management.models import Board
 
 
 def user_dashboard(request):
@@ -25,15 +24,15 @@ def user_dashboard(request):
 
 
 def get_log_data(model_class, start, end, request_user_id=None):
-    queryset = model_class.objects.filter(create_time__gte=start, create_time__lte=end)\
-        .annotate(date=Cast('create_time', output_field=DateField()))\
-            .values('date')\
-                .annotate(count=Count('id'))\
-                    .order_by('date')
+    queryset = model_class.objects.filter(create_time__range=[start, end])
     
     if request_user_id is not None:
         queryset = queryset.filter(auth_user=request_user_id)
-    
+        
+    queryset = queryset.annotate(
+        date=Cast('create_time', output_field=DateField())
+    ).values('date').annotate(count=Count('id')).order_by('date')
+
     return [{'type': str(model_class), 'date': item['date'], 'count': item['count']} for item in queryset]
 
 

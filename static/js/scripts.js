@@ -106,11 +106,11 @@ $(document).ready(function () {
                 console.log(date);
 
                 if (flag === "상담") {
-                    window.location.href = "{% url 'counseling:history' %}?startDate=" + date + "&endDate=" + date;
+                    window.location.href = "counseling/history?startDate=" + date + "&endDate=" + date;
                 } else if (flag === "퀴즈") {
-                    window.location.href = "{% url 'education:quiz_history' %}?startDate=" + date + "&endDate=" + date;
+                    window.location.href = "education/quiz_history?startDate=" + date + "&endDate=" + date;
                 } else {
-                    window.location.href = "{% url 'education:edu_history' %}?startDate=" + date + "&endDate=" + date;
+                    window.location.href = "education/edu_history?startDate=" + date + "&endDate=" + date;
                 }
             }
         });

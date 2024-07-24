@@ -188,6 +188,26 @@ def board_detail(request, id):
 
 def board_edit(request, id):
     board = get_object_or_404(Board, id=id)
+    
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        body = request.POST.get('body')
+        flag = request.POST.get('flag')
+        file = request.FILES.get('file')
+        print('='*30)
+        print(title)
+        print(body)
+        print(flag)
+        print(file)
+        print('='*30)
+
+        board.title = title
+        board.body = body
+        board.flag = flag
+        
+
+        board.save()
+        return redirect('management:board_detail', id=board.id)
     return render(request, 'management/board_detail.html', {'board': board})
 
 def detail(request, id, flag):

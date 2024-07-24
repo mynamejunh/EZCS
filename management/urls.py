@@ -35,5 +35,6 @@ urlpatterns = [
     path('board/', views.board_list, name='board_list'),  # 공지사항 목록
     path('board/create/', views.board_create, name='board_create'),  # 공지사항 작성
     path('board/<int:id>/', views.board_detail, name='board_detail'),  # 공지사항 상세보기
+    path('board/<int:id>/board_edit', views.board_edit, name='board_edit'),  # 공지사항 상세보기
     path('board/<int:id>/delete/', views.board_delete, name='board_delete'),  # 삭제 URL 추가
 ]

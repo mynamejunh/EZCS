@@ -25,6 +25,7 @@ prompt = Prompt()
 prompt.set_initial_behavior_policy_for_education()
 
 
+@csrf_exempt
 def chat_view(request):
     '''
     교육 페이지
@@ -41,7 +42,7 @@ def chat_view(request):
             output = chatbot.chat(message)
 
             evaluation_chatbot = Chatbot(
-                # model_id="gpt-4o",
+                model_id="gpt-4o",
                 category=category,
                 THRESHOLD=2,
                 behavior_policy=prompt.get_messages_for_evaluation(output, message),
@@ -99,7 +100,7 @@ def chat_view(request):
         elif category:
             # Chatbot 객체 초기화
             chatbot = Chatbot(
-                # model_id="gpt-4o",
+                model_id="gpt-4o",
                 category=category,
                 THRESHOLD=2,
                 behavior_policy=prompt.get_behavior_policy(),
@@ -198,7 +199,20 @@ def edu_history(request):
         'overall_avg_score'
     )
 
-    paginator = Paginator(data, 10)
+    # 데이터에서 None 값을 가지는 항목 제거
+    filtered_data = []
+    for item in data:
+        if None not in [
+            item['avg_accuracy_score'],
+            item['avg_kind_score'],
+            item['avg_solving_score'],
+            item['avg_add_score'],
+            item['avg_time_score'],
+            item['overall_avg_score']
+        ]:
+            filtered_data.append(item)
+
+    paginator = Paginator(filtered_data, 10)
     page = request.GET.get('page')
     data = paginator.get_page(page)
 

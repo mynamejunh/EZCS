@@ -1,5 +1,4 @@
-document.addEventListener("DOMContentLoaded", function() {
-    setTodayDate();
+document.addEventListener("DOMContentLoaded", function () {
     preventKeyboardInputOnDate();
 });
 
@@ -7,13 +6,13 @@ function setTodayDate() {
     var today = new Date();
     var day = ("0" + today.getDate()).slice(-2);
     var month = ("0" + (today.getMonth() + 1)).slice(-2);
-    var todayDate = today.getFullYear() + "-" + (month) + "-" + (day);
+    var todayDate = today.getFullYear() + "-" + month + "-" + day;
     document.getElementById("birthdate").value = todayDate;
 }
 
 function preventKeyboardInputOnDate() {
     var birthdateInput = document.getElementById("birthdate");
-    birthdateInput.addEventListener("keydown", function(event) {
+    birthdateInput.addEventListener("keydown", function (event) {
         event.preventDefault();
     });
 }

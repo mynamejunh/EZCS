@@ -12,18 +12,17 @@
 </script>
 <div class="dashboard">
     <div>
-        <h2 style="font-weight: bold;">공지 사항 목록</h2>
+        <h2>공지 사항 목록</h2>
     </div>
-    <div>
-        <a href="{% url 'management:board_create' %}" class="btn btn-primary mb-3" style="float: right; margin-top: 10px;">공지 사항 작성</a>
-    </div>
+    <a href="{% url 'management:board_create' %}" class="btn btn-primary mb-3" style="float: right; margin-top: 10px;">공지 사항 작성</a>
     <div>
         <ul>
             <li>
                 <select name="searchSelect" id="searchSelect" class="form-control" style="cursor: pointer;">
                     <option value="0" {% if searchSelect == '0' %}selected{% endif %}>전체</option>
-                    <option value="1" {% if searchSelect == '1' %}selected{% endif %}>작성자</option>
-                    <option value="2" {% if searchSelect == '2' %}selected{% endif %}>제목</option>
+                    <option value="1" {% if searchSelect == '1' %}selected{% endif %}>제목</option>
+                    <option value="2" {% if searchSelect == '2' %}selected{% endif %}>본문</option>
+                    <option value="3" {% if searchSelect == '3' %}selected{% endif %}>작성자</option>
                 </select>
             </li>
             <li><input type="text" class="form-control" style="width: 450px; height: 38px;" id="searchText" name="searchText" placeholder="검색창" value="{{ searchText }}"></li>
@@ -39,33 +38,44 @@
         </ul>
     </div>
     <div>
-        <span style="float: left;">총 {{ boards|length }}건</span>
+        <span style="float: left;">총 {{ data|length }}건</span>
     </div>
     <div>
         <table class="styled-table">
             <colgroup>
                 <col width="5%">
                 <col width="35%">
+                <col width="*">
                 <col width="15%">
+                <col width="15%">
+                <col width="10%">
             </colgroup>
             <thead>
                 <th>순번</th>
                 <th>제목</th>
-                <th>일자</th>
+                <th>본문</th>
+                <th>작성 일자</th>
+                <th>수정 일자</th>
                 <th>작성자</th>
             </thead>
             <tbody>
-                {% for board in boards %}
-                <tr data-url="{% url 'management:board_detail' board.id %}" class="active-row">
+                {% for item in data %}
+                <tr data-url="{% url 'management:board_detail' item.id %}" class="active-row">
                     <td>{{ forloop.counter }}</td>
                     <td>
-                        {{ board.title }}
+                        {{ item.title }}
                     </td>
                     <td>
-                        <span>{{ board.create_time|date:"Y.m.d" }}</span>
+                        {{ item.body }}
                     </td>
                     <td>
-                        {{ board.auth_user.username }}
+                        <span>{{ item.create_time|date:"Y.m.d" }}</span>
+                    </td>
+                    <td>
+                        <span>{{ item.update_time|date:"Y.m.d" }}</span>
+                    </td>
+                    <td>
+                        {{ item.auth_user.username }}
                     </td>
                 </tr>
                 {% empty %}

@@ -1,3 +1,19 @@
+# 📞EZCS AI 상담 어시스턴스
+
+## 📜 1. 프로젝트 개요
+ KT AIVLE 빅프로젝트
+
+## 📞 LOGO
+!
+##사용 툴
+- Django
+- AWS
+- GITHUB
+- figma
+- 
+
+
+### 팀원 및 역할 분담
 ### file명 정의
 - **accounts** :
     - [X] 로그인/회원가입

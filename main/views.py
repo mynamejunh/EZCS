@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.password_validation import validate_password
@@ -16,6 +18,9 @@ from management.models import Board
 
 
 def user_dashboard(request):
+    """
+        메인 페이지 대시보드
+    """
     notices = Board.objects.filter(flag=0).order_by('-create_time')
     paginator = Paginator(notices, 10)
     page = request.GET.get('page')
@@ -23,23 +28,17 @@ def user_dashboard(request):
     return render(request, 'main/index.html', {'notices': notices})
 
 
-def get_log_data(model_class, start, end, request_user_id=None):
-    queryset = model_class.objects.filter(create_time__range=[start, end])
-    
-    if request_user_id is not None:
-        queryset = queryset.filter(auth_user=request_user_id)
-        
-    queryset = queryset.annotate(
-        date=Cast('create_time', output_field=DateField())
-    ).values('date').annotate(count=Count('id')).order_by('date')
-
-    return [{'type': str(model_class), 'date': item['date'], 'count': item['count']} for item in queryset]
-
-
 def get_calendar(request, start, end):
-    start += " 00:00:00"
-    end += " 00:00:00"
+    """
+    사용자의 요청에 따라 로그 데이터를 날짜별로 조회하여 JSON 형식으로 반환합니다.
 
+    :param request: HTTP 요청 객체
+    :param start: 조회 시작 날짜 (형식: 'YYYY-MM-DD')
+    :param end: 조회 종료 날짜 (형식: 'YYYY-MM-DD')
+    :return: 날짜별 로그 수와 모델 정보를 포함하는 JSON 응답
+    """
+
+    # 슈퍼유저인 경우 모든 사용자의 로그를 조회, 그렇지 않으면 현재 사용자의 로그를 조회
     if request.user.is_superuser:
         counsel_data = get_log_data(CounselLog, start, end)
         education_data = get_log_data(EducationLog, start, end)
@@ -49,12 +48,17 @@ def get_calendar(request, start, end):
         education_data = get_log_data(EducationLog, start, end, request.user.id)
         quiz_data = get_log_data(QuizHistory, start, end, request.user.id)
     
+    # 모든 모델 데이터 합치기
     data = counsel_data + education_data + quiz_data
 
+    # JSON 형식으로 응답 반환
     return JsonResponse(data, safe=False)
 
 
 def notice_detail(request, id):
+    """
+    공지 사항 상세
+    """
     notice = get_object_or_404(Board, id=id)
     is_image = False
     if notice.file:
@@ -62,11 +66,29 @@ def notice_detail(request, id):
     return render(request, 'main/notice_detail.html', {'notice': notice, 'is_image': is_image})
 
 
-def start_ezcs(request):
-    return render(request, 'main/startezcs.html')
+@csrf_exempt
+def verify_password(request):
+    """
+    비밀번호 확인
+    """
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        user = request.user
+        authenticated_user = authenticate(username=user.username, password=password)
+
+        if authenticated_user is not None:
+            request.session['password_verified'] = True
+            return JsonResponse({'valid': True})
+        else:
+            return JsonResponse({'valid': False})
+
+    return JsonResponse({'valid': False})
 
 
 def edit_profile(request):
+    """
+    내 정보 수정
+    """
     if not request.session.get('password_verified'):
         return redirect('main:user_dashboard')  # 비밀번호 확인 안된 경우 대시보드로 리다이렉트
 
@@ -107,25 +129,42 @@ def edit_profile(request):
         'email_domains': email_domains
     })
 
+
 def contract(request):
+    """
+        이용약관 페이지
+    """
     return render(request, 'main/contract.html')
 
 
 def privacy(request):
+    """
+        개인정보 처리방침 페이지
+    """
     return render(request, 'main/privacy.html')
 
 
-@csrf_exempt
-def verify_password(request):
-    if request.method == 'POST':
-        password = request.POST.get('password')
-        user = request.user
-        authenticated_user = authenticate(username=user.username, password=password)
+def get_log_data(model_class, start, end, request_user_id=None):
+    """
+    특정 모델 클래스의 로그 데이터를 조회하여, 주어진 기간 동안의 로그 수를 날짜별로 집계합니다.
 
-        if authenticated_user is not None:
-            request.session['password_verified'] = True
-            return JsonResponse({'valid': True})
-        else:
-            return JsonResponse({'valid': False})
+    :param model_class: 로그를 조회할 모델 클래스 (예: CounselLog, EducationLog, QuizHistory)
+    :param start: 조회 시작 날짜 (형식: 'YYYY-MM-DD')
+    :param end: 조회 종료 날짜 (형식: 'YYYY-MM-DD')
+    :param request_user_id: 필터링할 사용자 ID (옵션, None일 경우 모든 사용자의 로그 조회)
+    :return: 날짜별 로그 수와 모델 정보를 포함하는 딕셔너리 리스트
+    """
+    # 주어진 기간 동안의 데이터 필터링
+    queryset = model_class.objects.filter(create_time__range=[start+" 09:00:00", datetime.strptime(end+" 09:00:00", "%Y-%m-%d %H:%M:%S")])
+    
+    # 사용자가 지정된 경우, 해당 사용자 ID로 추가 필터링
+    if request_user_id is not None:
+        queryset = queryset.filter(auth_user=request_user_id)
+    
+    # 날짜별로 집계할 수 있도록 날짜 필드 생성 및 로그 수 계산
+    queryset = queryset.annotate(
+        date=Cast('create_time', output_field=DateField())
+    ).values('date').annotate(count=Count('id')).order_by('date')
 
-    return JsonResponse({'valid': False})
+    # 결과를 딕셔너리 리스트로 변환
+    return [{'type': str(model_class), 'date': item['date'], 'count': item['count']} for item in queryset]

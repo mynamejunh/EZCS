@@ -1,6 +1,5 @@
 import random
 import json
-import logging
 
 from chat import Chatbot
 from chat_trans import Chatbot_trans
@@ -18,18 +17,15 @@ from abuse_filter import AbuseFilter
 from .models import *
 
 
-logger = logging.getLogger(__name__)
 abuse_filter = AbuseFilter()
-
 prompt = Prompt()
-
 trans_chat_bot = None
 recommend_chat_bot = None
 
 
 def counsel(request):
     """
-    상담 페이지
+        AI 상담
     """
     if request.method == "POST":
         global trans_chat_bot, recommend_chat_bot
@@ -85,7 +81,22 @@ def update_log(request):
     return JsonResponse({"error": "Invalid request"}, status=400)
 
 
+def delete_counseling_init_data(request):
+    """
+        상담 초기만 존재하는 데이터 삭제
+    """
+    if request.method == "POST":
+        id = request.POST.get('id')
+        LogItem.objects.filter(log=id).delete()
+        Log.objects.filter(id=id).delete()
+        return JsonResponse({"response": "True"})
+    return JsonResponse({"response": "False"})
+
+
 def ai_model(request):
+    """
+        대화 내용 INSERT
+    """
     if request.method == "POST":
         classify = request.POST.get("classify")
         message = request.POST.get("message")
@@ -111,11 +122,6 @@ def ai_model(request):
             return JsonResponse({"success": False, "error": str(e)})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
-
-def mask_name(full_name):
-    if len(full_name) > 1:
-        return full_name[:-1] + '*'
-    return full_name
 
 
 def history(request):
@@ -177,158 +183,20 @@ def history(request):
 
 
 def detail(request, id):
+    """
+        AI 상담 이력 상세 페이지
+    """
     head = Log.objects.get(id=id)
     data = LogItem.objects.filter(log_id=id)
     context = {"head": head, "data": data}
     return render(request, "counseling/detail.html", context)
 
 
-def list(request):
-    customer = CustomerProfile.objects.order_by("?").first()
-
-    if customer:
-        log = Log.objects.filter(customer=customer)
-
-        if log:
-            random_counsel_log = random.choice(log)
-
-            try:
-                if isinstance(random_counsel_log.memo, str):
-                    memo_json = json.loads(
-                        random_counsel_log.memo
-                    )  # memo 필드를 JSON 형식으로 파싱
-                elif isinstance(random_counsel_log.memo, dict):
-                    memo_json = random_counsel_log.memo
-                else:
-                    memo_json = {}
-                random_counsel_log.inquiry_text = memo_json.get("inquiry_text", "")
-                random_counsel_log.action_text = memo_json.get("action_text", "")
-            except (TypeError, json.JSONDecodeError) as e:
-                print(f"Error parsing memo for log {random_counsel_log.id}: {e}")
-                random_counsel_log.inquiry_text = ""
-                random_counsel_log.action_text = ""
-
-            context = {
-                "customer": customer,
-                "counsel_logs": [random_counsel_log],  # 리스트로 전달
-            }
-        else:
-            # 상담 기록이 없는 경우 빈 리스트 전달
-            context = {"customer": customer, "counsel_logs": []}
+def mask_name(full_name):
+    """
+        이름 마스킹
+    """
+    if len(full_name) <= 2:
+        return full_name[:-1] + '*'
     else:
-        # 고객 정보가 없는 경우 빈 리스트 전달
-        context = {"customer_info": None, "counsel_logs": []}
-
-    return render(request, "counseling/index.html", context)
-
-
-@csrf_exempt
-def save_counseling_log(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body.decode("utf-8"))
-
-            username = data.get("username")
-            phone_number_str = data.get("phone_number")
-
-            try:
-                phone_number = CustomerProfile.objects.get(
-                    phone_number=phone_number_str
-                )
-            except CustomerProfile.DoesNotExist:
-                return JsonResponse(
-                    {"success": False, "error": "CustomerProfile not found"}
-                )
-
-            chat_data = json.dumps(data.get("chat_data", {}), ensure_ascii=False)
-            memo_data = json.dumps(data.get("memo_data", {}), ensure_ascii=False)
-
-            counselLog = Log(
-                username=username,
-                phone_number=phone_number,
-                body=chat_data,
-                memo=memo_data,
-            )
-            counselLog.save()
-
-            return JsonResponse({"success": True})
-        except Exception as e:
-            print(f"Error: {str(e)}")
-            return JsonResponse({"success": False, "error": str(e)})
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
-
-
-@csrf_exempt
-def save_consultation(request):
-    if request.method == "POST":
-        try:
-            log_id = request.POST.get("log_id")
-            inquiry_text = request.POST.get("inquiry_text")
-            action_text = request.POST.get("action_text")
-
-            if log_id and (inquiry_text or action_text):
-                counsel_log = Log.objects.get(id=log_id)
-                memo = (
-                    json.loads(counsel_log.memo)
-                    if isinstance(counsel_log.memo, str)
-                    else counsel_log.memo or {}
-                )
-                memo["inquiry_text"] = inquiry_text
-                memo["action_text"] = action_text
-                counsel_log.memo = json.dumps(memo, ensure_ascii=False)
-                counsel_log.save()
-
-                return JsonResponse({"success": True})
-            else:
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "error": "Missing log_id, inquiry_text, or action_text",
-                    }
-                )
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
-    return JsonResponse({"success": False, "error": "Invalid request"})
-
-
-@csrf_exempt
-def save_consultation(request):
-    if request.method == "POST":
-        try:
-            log_id = request.POST.get("log_id")
-            inquiry_text = request.POST.get("inquiry_text")
-            action_text = request.POST.get("action_text")
-
-            if log_id and (inquiry_text or action_text):
-                counsel_log = Log.objects.get(id=log_id)
-                memo = (
-                    json.loads(counsel_log.memo)
-                    if isinstance(counsel_log.memo, str)
-                    else counsel_log.memo or {}
-                )
-                memo["inquiry_text"] = inquiry_text
-                memo["action_text"] = action_text
-                counsel_log.memo = json.dumps(memo, ensure_ascii=False)
-                counsel_log.save()
-
-                return JsonResponse({"success": True})
-            else:
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "error": "Missing log_id, inquiry_text, or action_text",
-                    }
-                )
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
-    return JsonResponse({"success": False, "error": "Invalid request"})
-
-
-def delete_counseling_init_data(request):
-    if request.method == "POST":
-        id = request.POST.get('id')
-        LogItem.objects.filter(log=id).delete()
-        Log.objects.filter(id=id).delete()
-        return JsonResponse({"response": "True"})
-    return JsonResponse({"response": "False"})
+        return full_name[0] + '*' * (len(full_name) - 2) + full_name[-1]

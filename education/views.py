@@ -1,5 +1,4 @@
 import json
-import logging
 from datetime import datetime, timedelta
 
 from .models import *
@@ -16,9 +15,6 @@ from chat import Chatbot
 from prompt import Prompt
 
 
-logger = logging.getLogger(__name__)
-
-
 chatbot = None
 evaluation_chatbot = None
 prompt = Prompt()
@@ -28,7 +24,7 @@ prompt.set_initial_behavior_policy_for_education()
 @csrf_exempt
 def chat_view(request):
     '''
-    교육 페이지
+    AI 트레이너 페이지
     '''
     if request.method == "POST":
         global chatbot
@@ -38,7 +34,7 @@ def chat_view(request):
             log_header_id = request.POST.get("log_header", None)
             if chatbot is None:
                 return JsonResponse({"response": "Chatbot is not initialized. Please select a category first."})
-            # 사용자 메시지에 대한 응답 생성
+            
             output = chatbot.chat(message)
 
             evaluation_chatbot = Chatbot(
@@ -98,7 +94,6 @@ def chat_view(request):
                 , "output": evaluation_output
             })
         elif category:
-            # Chatbot 객체 초기화
             chatbot = Chatbot(
                 model_id="gpt-4o",
                 category=category,
@@ -106,15 +101,14 @@ def chat_view(request):
                 behavior_policy=prompt.get_behavior_policy(),
             )
 
-            # 첫 질문 생성
             initial_question = chatbot.chat("고객의 역할에서 민원을 말해줘")
-            logger.log(1, initial_question)
             if category == '모바일 > 부가서비스':
                 category = 0
             elif category == '모바일 > 서비스정책':
                 category = 1
             else:
                 category = 2
+
             log_header = Log.objects.create(
                 category=category
                 , auth_user_id=request.user.id
@@ -134,12 +128,23 @@ def chat_view(request):
     return render(request, "education/index.html")
     
 
+def delete_training_init_data(request):
+    """
+        AI 트레이너 바로 종료 시 데이터 삭제
+    """
+    if request.method == "POST":
+        id = request.POST.get('id')
+        LogItem.objects.filter(log=id).delete()
+        Log.objects.filter(id=id).delete()
+        return JsonResponse({"response": "True"})
+    return JsonResponse({"response": "False"})
+
+
 def edu_history(request):
     '''
-    교육 이력 페이지
+    AI 트레이너 이력 페이지
     '''
 
-    # 검색 필터링 처리
     search_text = request.GET.get("searchText", "")
     search_select = request.GET.get("searchSelect", "")
     
@@ -198,7 +203,6 @@ def edu_history(request):
         'overall_avg_score'
     )
     
-    # 데이터에서 None 값을 가지는 항목 제거
     filtered_data = []
     for item in data:
         if None not in [
@@ -229,7 +233,7 @@ def edu_history(request):
 
 def edu_details(request, id):
     '''
-    교육 이력 상세 페이지
+    AI 트레이너 이력 상세 페이지
     '''
     head = Log.objects.get(id=id)
     data = LogItem.objects.filter(log_id=id)
@@ -245,10 +249,6 @@ def quiz(request):
     '''
     퀴즈페이지
     '''
-    # quizzes = Quiz.objects.filter(category = 0)
-    
-    # quizzes = quizzes.order_by('?')[:5]
-    
     quizzes = Quiz.objects.order_by('?')[:5]  # 퀴즈 5개를 랜덤으로 가져오기
 
     if request.method == "POST":  # 폼 제출이 POST 요청으로 이루어질 때
@@ -264,8 +264,6 @@ def quiz(request):
                 try:
                     quiz = Quiz.objects.get(id=quiz_ids[idx])  # 현재 퀴즈 ID로 퀴즈 객체 가져오기
                 except Quiz.DoesNotExist:
-                    # 퀴즈가 존재하지 않을 경우 오류 출력
-                    print(f"Quiz with id {quiz_ids[idx]} does not exist.")
                     continue
 
                 is_correct = False  # 초기 값은 오답으로 설정
@@ -295,9 +293,6 @@ def quiz(request):
             )
             history.save()
 
-            # 디버깅 정보 출력
-            print(f"QuizHistory saved: {history}")
-
             # QuizHistoryItem 객체 생성 및 저장
             for idx, answer in enumerate(answers):
                 quiz = Quiz.objects.get(id=quiz_ids[idx])
@@ -306,9 +301,6 @@ def quiz(request):
                     quiz=quiz,
                     answer=answer,
                 )
-
-                # 디버깅 정보 출력
-                print(f"QuizHistoryItem saved: {item}")
 
             return JsonResponse({"results": results})  # 결과를 JSON 형태로 반환
 
@@ -369,6 +361,7 @@ def quiz_history(request):
 
     return render(request, "education/quiz_history.html", context)
 
+
 def quiz_details(request, log_id):
     '''
     퀴즈 이력 상세
@@ -381,12 +374,3 @@ def quiz_details(request, log_id):
         , 'data': data
     }
     return render(request, 'education/quiz_details.html', context)
-
-
-def delete_training_init_data(request):
-    if request.method == "POST":
-        id = request.POST.get('id')
-        LogItem.objects.filter(log=id).delete()
-        Log.objects.filter(id=id).delete()
-        return JsonResponse({"response": "True"})
-    return JsonResponse({"response": "False"})

@@ -4,26 +4,21 @@ from . import views
 app_name = "counseling"
 
 urlpatterns = [
+    # AI 상담
     path("", views.counsel, name="counsel"),
 
+    # 고객 정보 수정
     path("update_log/", views.update_log, name="updateLog"),
 
-    path("ai/", views.ai_model, name="aiModel"),
-
-    path("history/", views.history, name="history"),
-
-    path("detail/<int:id>/", views.detail, name="detail"),
-
+    # 상담 바로 종료 시 데이터 삭제
     path("delCounselData/", views.delete_counseling_init_data, name="delCounselData"),
 
+    # 대화 내용 INSERT
+    path("ai/", views.ai_model, name="aiModel"),
 
+    # AI 상담 이력
+    path("history/", views.history, name="history"),
 
-
-    path("", views.list, name="list"),
-
-    path("save_counseling_log/", views.save_counseling_log, name="save_counseling_log"),
-    path("save_consultation/", views.save_consultation, name="save_consultation"),
-    # path('evaluation_chat/', views.evaluation_chat, name='evaluation_chat'),
-
-    # path('customer_detail/', views.customer_detail, name='customer_detail')
+    # AI 상담 이력 상세 페이지
+    path("detail/<int:id>/", views.detail, name="detail"),
 ]

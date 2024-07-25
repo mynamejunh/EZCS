@@ -42,9 +42,7 @@ def counsel(request):
             behavior_policy=prompt.get_behavior_policy_for_trans(),
         )
 
-
         recommend_chat_bot = Chatbot(behavior_policy=prompt.get_behavior_policy_for_recommend(), k=1)
-
 
         return render(request, "counseling/index.html", context)
 
@@ -130,11 +128,11 @@ def history(request):
     start_date = request.GET.get("startDate", "")
     end_date = request.GET.get("endDate", "")
 
-    query = Q()
+    superuser_query = Q()
     if not request.user.is_superuser:
-        query = Q(auth_user=request.user.id)
+        superuser_query = Q(auth_user=request.user.id)
 
-    query1 = Q()
+    search_query = Q()
     if search_select:
         valid_fields = {
             '1': 'customer__name__icontains',
@@ -144,21 +142,20 @@ def history(request):
 
         if search_select == '0':
             for val in valid_fields.values():
-                query1 |= Q(**{val: search_text})
+                search_query |= Q(**{val: search_text})
         else:
             search_field = valid_fields[search_select]
-            query1 = Q(**{search_field: search_text})
+            search_query = Q(**{search_field: search_text})
 
-    query2 = Q()
-    if start_date and end_date:
-        query2 = Q(create_time__range=[start_date+" 00:00:00", end_date+" 23:59:59"])
-    else:
+    date_query = Q()
+    if not (start_date and end_date):
         one_month_ago = datetime.now() - timedelta(days=30)
-        query2 = Q(create_time__range=[one_month_ago, datetime.now()])
         start_date = one_month_ago.strftime("%Y-%m-%d")
         end_date = datetime.now().strftime("%Y-%m-%d")
 
-    data = Log.objects.filter(query & query1 & query2).order_by("-create_time", "customer_id", "auth_user_id")
+    date_query = Q(create_time__range=[start_date+" 09:00:00", datetime.strptime(end_date+" 09:00:00", "%Y-%m-%d %H:%M:%S") + timedelta(days=1)])
+
+    data = Log.objects.filter(superuser_query & search_query & date_query).order_by("-create_time", "customer_id", "auth_user_id")
 
     paginator = Paginator(data, 10)
     page = request.GET.get("page")

@@ -146,24 +146,24 @@ def edu_history(request):
     start_date = request.GET.get("startDate", "")
     end_date = request.GET.get("endDate", "")
 
-    query = Q()
+    superuser_query = Q()
     if not request.user.is_superuser:
-        query = Q(auth_user=request.user.id)
+        superuser_query = Q(auth_user=request.user.id)
     
-    query2 = Q()
+    search_query = Q()
     if search_select:
-        query2 = Q(category=search_select)
+        search_query = Q(category=search_select)
 
-    query3 = Q()
-    if start_date and end_date:
-        query3 = Q(create_time__range=[start_date+" 00:00:00", end_date+" 23:59:59"])
-    else:
+    date_query = Q()
+    if not (start_date and end_date):
         one_month_ago = datetime.now() - timedelta(days=30)
-        query3 = Q(create_time__range=[one_month_ago, datetime.now()])
-        start_date = one_month_ago.strftime('%Y-%m-%d')
-        end_date = datetime.now().strftime('%Y-%m-%d')
+        date_query = Q(create_time__range=[one_month_ago, datetime.now()])
+        start_date = one_month_ago.strftime("%Y-%m-%d")
+        end_date = datetime.now().strftime("%Y-%m-%d")
 
-    data = Log.objects.filter(query & query2 & query3).order_by('-create_time', 'category')
+    date_query = Q(create_time__range=[start_date+" 09:00:00", datetime.strptime(end_date+" 09:00:00", "%Y-%m-%d %H:%M:%S") + timedelta(days=1)])
+
+    data = Log.objects.filter(superuser_query & search_query & date_query).order_by('-create_time', 'category')
     
     data = data.annotate(
         avg_accuracy_score=Round(Avg('education_log_items__accuracy_score'), 2),
@@ -331,28 +331,28 @@ def quiz_history(request):
 
     result = request.GET.get("result", "")
 
-    query = Q()
+    superuser_query = Q()
     if not request.user.is_superuser:
-        query = Q(auth_user_id=request.user.id)
+        superuser_query = Q(auth_user_id=request.user.id)
 
-    query2 = Q()
+    search_query = Q()
     if search_select:
-        query2 = Q(category=search_select)
+        search_query = Q(category=search_select)
 
-    query3 = Q()
+    pass_query = Q()
     if result:
-        query3 = Q(is_passed=result)
+        pass_query = Q(is_passed=result)
 
-    query4 = Q()
-    if start_date and end_date:
-        query4 = Q(create_time__range=[start_date+" 00:00:00", end_date+" 23:59:59"])
-    else:
+    date_query = Q()
+    if not (start_date and end_date):
         one_month_ago = datetime.now() - timedelta(days=30)
-        query4 = Q(create_time__range=[one_month_ago, datetime.now()])
-        start_date = one_month_ago.strftime('%Y-%m-%d')
-        end_date = datetime.now().strftime('%Y-%m-%d')
+        date_query = Q(create_time__range=[one_month_ago, datetime.now()])
+        start_date = one_month_ago.strftime("%Y-%m-%d")
+        end_date = datetime.now().strftime("%Y-%m-%d")
 
-    data = QuizHistory.objects.filter(query & query2 & query3 & query4).select_related('auth_user').order_by('-create_time', 'category')
+    date_query = Q(create_time__range=[start_date+" 09:00:00", datetime.strptime(end_date+" 09:00:00", "%Y-%m-%d %H:%M:%S") + timedelta(days=1)])
+
+    data = QuizHistory.objects.filter(superuser_query & search_query & pass_query & date_query).select_related('auth_user').order_by('-create_time', 'category')
 
     paginator = Paginator(data, 10)
     page = request.GET.get('page')

@@ -10,35 +10,6 @@
     <link href="{% static 'css/bootstrap/bootstrap.min.css' %}" rel="stylesheet" />
     <script src="{% static 'js/bootstrap/bootstrap.bundle.min.js' %}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        function openContractPopup() {
-            var width = 800;
-            var height = 600;
-            var left = (screen.width - width) / 2;
-            var top = (screen.height - height) / 2;
-            window.open("{% url 'main:contract' %}", "Terms and Conditions", "width=" + width + ",height=" + height + ",top=" + top + ",left=" + left);
-        }
-
-        function openPrivacyPopup() {
-            var width = 800;
-            var height = 600;
-            var left = (screen.width - width) / 2;
-            var top = (screen.height - height) / 2;
-            window.open("{% url 'main:privacy' %}", "Privacy Policy", "width=" + width + ",height=" + height + ",top=" + top + ",left=" + left);
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('hidden');
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', toggleSidebar);
-            }
-        });
-    </script>
 </head>
 
 <body>
@@ -60,10 +31,8 @@
                     <a href="{% url 'education:chat_view' %}" class="{% if request.path == '/education/' %}active{% endif %}">AI 트레이너</a>
                     <ul class="submenu">
                         <li><a href="{% url 'education:edu_history' %}" class="{% if request.path == '/education/edu_history/' %}active{% endif %}">AI 트레이너 이력</a></li>
-                        {% comment %} <li><a href="{% url 'education:edu_details' %}" class="{% if request.path == '/education/edu_details/' %}active{% endif %}">AI 트레이너 이력 상세(개발용)</a></li> {% endcomment %}
                         <li><a href="{% url 'education:quiz' %}" class="{% if request.path == '/education/quiz/' %}active{% endif %}">퀴즈</a></li>
                         <li><a href="{% url 'education:quiz_history' %}" class="{% if request.path == '/education/quiz_history/' %}active{% endif %}">퀴즈 이력</a></li>
-                        {% comment %} <li><a href="{% url 'education:quiz_details' %}" class="{% if request.path == '/education/quiz_details/' %}active{% endif %}">퀴즈 이력 상세</a></li> {% endcomment %}
                     </ul>
                 </li>
             </ul>
@@ -80,7 +49,6 @@
         <div class="header">
             <button class="sidebar-toggle" id="sidebarToggle">☰</button>
             <div class="header-right">
-                {% comment %} <div class="profile-info">{{ request.session.user }}님, 오늘 하루도 화이팅 하세요.</div> {% endcomment %}
                 <div class="profile-info">{{ request.user }}님, 오늘 하루도 화이팅 하세요.</div>
                 {% if request.user.is_superuser %}
                 <div class="admin-page">

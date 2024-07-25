@@ -46,6 +46,11 @@ $(document).ready(function () {
         checkPassword();
     });
 
+    const sidebarToggle = document.getElementById("sidebarToggle");
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener("click", toggleSidebar);
+    }
+
     if ($("#calendar").length > 0) {
         var calendarEl = document.getElementById("calendar");
         calendar = new FullCalendar.Calendar(calendarEl, {
@@ -115,56 +120,7 @@ $(document).ready(function () {
         });
         calendar.render();
     }
-    /* 
-    var sidebar = document.getElementById("sidebar");
-    var btnCollapse = document.getElementById("btn-collapse");
-    var btnExpand = document.getElementById("btn-expand");
-    var content = document.querySelector(".content");
-    var headerRight = document.querySelector(".header-right");
-
-    var sidebarState = getCookie("sidebarState");
-    if (sidebarState === "true") {
-        sidebar.classList.add("collapsed2");
-        content.classList.add("expanded2");
-        headerRight.classList.add("expanded2");
-        btnCollapse.style.display = "none";
-        btnExpand.style.display = "block";
-    } else {
-        sidebar.classList.remove("collapsed2");
-        content.classList.remove("expanded2");
-        headerRight.classList.remove("expanded2");
-        btnCollapse.style.display = "block";
-        btnExpand.style.display = "none";
-    }
-
-    btnCollapse.addEventListener("click", toggleSidebar);
-    btnExpand.addEventListener("click", toggleSidebar);
-     */
 });
-
-function toggleSidebar() {
-    var sidebar = document.getElementById("sidebar");
-    var btnCollapse = document.getElementById("btn-collapse");
-    var btnExpand = document.getElementById("btn-expand");
-    var content = document.querySelector(".content");
-    var headerRight = document.querySelector(".header-right");
-
-    sidebar.classList.toggle("collapsed");
-    content.classList.toggle("expanded");
-    headerRight.classList.toggle("expanded");
-    var isCollapsed = sidebar.classList.contains("collapsed");
-    btnCollapse.style.display = isCollapsed ? "none" : "block";
-    btnExpand.style.display = isCollapsed ? "block" : "none";
-
-    // 쿠키 설정
-    setCookie("sidebarState", isCollapsed ? "true" : "false", 7); // 쿠키를 7일 동안 유지
-
-    if ($("#calendar").length > 0) {
-        setTimeout(function () {
-            calendar.updateSize(); // 사이즈 조정
-        }, 300);
-    }
-}
 
 function checkPassword() {
     var password = $("#passwordCheck").val();
@@ -187,6 +143,14 @@ function checkPassword() {
     });
 }
 
+function formatDate(date) {
+    var year = date.getFullYear();
+    var month = ("0" + (date.getMonth() + 1)).slice(-2);
+    var day = ("0" + date.getDate()).slice(-2);
+
+    return year + "-" + month + "-" + day;
+}
+
 function openContractPopup() {
     var width = 800;
     var height = 600;
@@ -203,33 +167,7 @@ function openPrivacyPopup() {
     window.open("{% url 'main:privacy' %}", "Privacy Policy", "width=" + width + ",height=" + height + ",top=" + top + ",left=" + left);
 }
 
-function formatDate(date) {
-    var year = date.getFullYear();
-    var month = ("0" + (date.getMonth() + 1)).slice(-2);
-    var day = ("0" + date.getDate()).slice(-2);
-
-    return year + "-" + month + "-" + day;
-}
-
-// 쿠키를 설정하는 함수
-function setCookie(name, value, days) {
-    var expires = "";
-    if (days) {
-        var date = new Date();
-        date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
-        expires = "; expires=" + date.toUTCString();
-    }
-    document.cookie = name + "=" + (value || "") + expires + "; path=/";
-}
-
-// 쿠키를 읽는 함수
-function getCookie(name) {
-    var nameEQ = name + "=";
-    var ca = document.cookie.split(";");
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i];
-        while (c.charAt(0) === " ") c = c.substring(1, c.length);
-        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-    }
-    return null;
+function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    sidebar.classList.toggle("hidden");
 }

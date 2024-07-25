@@ -44,9 +44,7 @@
 <div id="popup-container" class="popup" style="display: none; width: 900px;">
     <div class="hd">
         <h3 class="tit">공지사항</h3>
-        <button type="button" class="btn_hide" onclick="closeModal()">
-            <img src="{% static 'main/img/ico_hide.svg' %}" alt="닫기">
-        </button>
+        <button type="button" class="btn-close" aria-label="Close" onclick="closeModal()"></button>
     </div>
     <div class="con" id="popup-content">
         <!-- Content will be loaded here -->
@@ -82,72 +80,4 @@
         document.getElementById('dimmed').style.display = 'none';
     }
 </script>
-
-<style>
-    .popup {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: #fff;
-        max-height: 100%;
-        overflow: auto;
-        z-index: 10000;
-        width: 80%;
-        max-width: 100%;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        border-radius: 8px;
-    }
-
-    .popup .hd {
-        padding: 10px;
-        border-bottom: 1px solid #ddd;
-        position: relative;
-    }
-
-    .popup .hd .btn_hide {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        background: none;
-        border: none;
-        cursor: pointer;
-    }
-
-    .popup .con {
-        padding: 20px;
-    }
-
-    .popup img {
-        max-width: 100%;
-        height: auto;
-        display: block;
-        margin: 0 auto;
-    }
-
-    .dimmed {
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        background-color: rgba(17, 17, 17, 0.5);
-        z-index: 9999;
-    }
-
-    .fc-button {
-        background-color: #009879 !important;
-        border-color: #009879 !important;
-    }
-
-    .fc-header-toolbar {
-        display: flex;
-        justify-content: center;
-    }
-
-    .fc-header-toolbar>div {
-        display: flex;
-        gap: 10px;
-    }
-</style>
 {% endblock %}

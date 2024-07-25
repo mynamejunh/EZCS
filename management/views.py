@@ -8,6 +8,8 @@ from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from bs4 import BeautifulSoup
+from django.core.files.storage import default_storage
+import re
 import os
 
 def board_delete(request, id):
@@ -183,7 +185,6 @@ def board_detail(request, id):
     board = get_object_or_404(Board, id=id)
     return render(request, 'management/board_detail.html', {'board': board})
 
-
 def board_edit(request, id):
     board = get_object_or_404(Board, id=id)
     
@@ -198,9 +199,8 @@ def board_edit(request, id):
         board.flag = flag
         
         if file:
-            # 기존 파일이 있을 경우 삭제합니다.
-            if board.file and os.path.isfile(board.file.path):
-                os.remove(board.file.path)
+            if board.file and default_storage.exists(board.file.name):
+                default_storage.delete(board.file.name)
             board.file = file
         
         board.save()

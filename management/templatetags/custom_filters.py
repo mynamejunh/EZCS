@@ -17,3 +17,7 @@ def index(value, index):
 def basename(value):
     import os
     return os.path.basename(value)
+
+@register.filter
+def contains(value, arg):
+    return arg in value

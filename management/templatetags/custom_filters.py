@@ -12,3 +12,8 @@ def index(value, index):
         return value[index]
     except (IndexError, TypeError):
         return None
+    
+@register.filter(name='basename')
+def basename(value):
+    import os
+    return os.path.basename(value)

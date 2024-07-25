@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from bs4 import BeautifulSoup
-
+import os
 
 def board_delete(request, id):
     board = get_object_or_404(Board, id=id)
@@ -183,6 +183,7 @@ def board_detail(request, id):
     board = get_object_or_404(Board, id=id)
     return render(request, 'management/board_detail.html', {'board': board})
 
+
 def board_edit(request, id):
     board = get_object_or_404(Board, id=id)
     
@@ -191,18 +192,17 @@ def board_edit(request, id):
         body = request.POST.get('body')
         flag = request.POST.get('flag')
         file = request.FILES.get('file')
-        print('='*30)
-        print(title)
-        print(body)
-        print(flag)
-        print(file)
-        print('='*30)
-
+        
         board.title = title
         board.body = body
         board.flag = flag
         
-
+        if file:
+            # 기존 파일이 있을 경우 삭제합니다.
+            if board.file and os.path.isfile(board.file.path):
+                os.remove(board.file.path)
+            board.file = file
+        
         board.save()
         return redirect('management:board_detail', id=board.id)
     return render(request, 'management/board_detail.html', {'board': board})

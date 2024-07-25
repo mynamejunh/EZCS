@@ -13,7 +13,7 @@
         <ul>
             {% for notice in notices %}
             <li>
-                <a href="{% url 'main:notice_detail' notice.id %}">{{ notice.title }}</a>
+                <a href="#" data-modal-url="{% url 'main:notice_detail' notice.id %}" class="open-popup">{{ notice.title }}</a>
                 <span>{{ notice.create_time|date:"Y.m.d" }}</span>
             </li>
             {% empty %}
@@ -40,8 +40,101 @@
     </div>
 </div>
 
-<script src="{% static 'main/js/calendar.js' %}"></script>
+<!-- Popup container -->
+<div id="popup-container" class="popup" style="display: none; width: 900px;">
+    <div class="hd">
+        <h3 class="tit">공지사항</h3>
+        <button type="button" class="btn_hide" onclick="closeModal()">
+            <img src="{% static 'main/img/ico_hide.svg' %}" alt="닫기">
+        </button>
+    </div>
+    <div class="con" id="popup-content">
+        <!-- Content will be loaded here -->
+    </div>
+</div>
+
+<!-- Dimmed layer -->
+<div class="dimmed" id="dimmed" style="display: none;"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.open-popup').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const url = this.getAttribute('data-modal-url');
+                const popup = document.getElementById('popup-container');
+                const dimmed = document.getElementById('dimmed');
+                
+                fetch(url)
+                    .then(response => response.text())
+                    .then(html => {
+                        document.getElementById('popup-content').innerHTML = html;
+                        popup.style.display = 'block';
+                        dimmed.style.display = 'block';
+                    })
+                    .catch(error => console.error('Error loading popup content:', error));
+            });
+        });
+    });
+
+    function closeModal() {
+        document.getElementById('popup-container').style.display = 'none';
+        document.getElementById('dimmed').style.display = 'none';
+    }
+</script>
+
 <style>
+    .popup {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        max-height: 100%;
+        overflow: auto;
+        z-index: 10000;
+        width: 80%;
+        max-width: 100%;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-radius: 8px;
+    }
+
+    .popup .hd {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        position: relative;
+    }
+
+    .popup .hd .btn_hide {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .popup .con {
+        padding: 20px;
+    }
+
+    .popup img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .dimmed {
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background-color: rgba(17, 17, 17, 0.5);
+        z-index: 9999;
+    }
+
     .fc-button {
         background-color: #009879 !important;
         border-color: #009879 !important;

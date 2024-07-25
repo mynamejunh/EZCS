@@ -156,7 +156,7 @@ function openContractPopup() {
     var height = 600;
     var left = (screen.width - width) / 2;
     var top = (screen.height - height) / 2;
-    window.open("{% url 'main:contract' %}", "Terms and Conditions", "width=" + width + ",height=" + height + ",top=" + top + ",left=" + left);
+    window.open("contract/", "Terms and Conditions", "width=" + width + ",height=" + height + ",top=" + top + ",left=" + left);
 }
 
 function openPrivacyPopup() {
@@ -164,7 +164,7 @@ function openPrivacyPopup() {
     var height = 600;
     var left = (screen.width - width) / 2;
     var top = (screen.height - height) / 2;
-    window.open("{% url 'main:privacy' %}", "Privacy Policy", "width=" + width + ",height=" + height + ",top=" + top + ",left=" + left);
+    window.open("privacy/", "Privacy Policy", "width=" + width + ",height=" + height + ",top=" + top + ",left=" + left);
 }
 
 function toggleSidebar() {

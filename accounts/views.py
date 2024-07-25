@@ -160,7 +160,7 @@ def searchPW(request):
             return JsonResponse({'result': 'success', 'msg': '인증 성공. 비밀번호를 재설정해주세요.'})
         except (User.DoesNotExist, CounselorProfile.DoesNotExist):
             return JsonResponse({'result': 'error', 'msg': '해당 정보의 사용자를 찾을 수 없습니다.'})
-    return render(request, 'accounts/searchPW.html')
+    return render(request, 'accounts/searchpw.html')
 
 
 def reset_password(request):

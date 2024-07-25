@@ -1,4 +1,3 @@
-/* 
 document.addEventListener("DOMContentLoaded", function () {
     const sidebar = document.getElementById("sidebar");
     const sidebarToggle = document.getElementById("sidebarToggle");
@@ -22,7 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("resize", handleResize);
     handleResize(); // 초기 로드 시 사이드바 상태 설정
 });
- */
+
 var calendar;
 $(document).ready(function () {
     // 내 정보 클릭 시 모달 표시
@@ -116,7 +115,7 @@ $(document).ready(function () {
         });
         calendar.render();
     }
-
+    /* 
     var sidebar = document.getElementById("sidebar");
     var btnCollapse = document.getElementById("btn-collapse");
     var btnExpand = document.getElementById("btn-expand");
@@ -140,6 +139,7 @@ $(document).ready(function () {
 
     btnCollapse.addEventListener("click", toggleSidebar);
     btnExpand.addEventListener("click", toggleSidebar);
+     */
 });
 
 function toggleSidebar() {

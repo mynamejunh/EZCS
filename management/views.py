@@ -32,20 +32,20 @@ def list(request, flag):
     search_text = request.GET.get("searchText", "")
     start_date = request.GET.get("startDate", "")
     end_date = request.GET.get("endDate", "")
-    query = Q()
+    superuser_query = Q()
 
     if flag == 'm':
-        query &= Q(auth_user__is_superuser=False)
-        query |= Q(active_status=1)
-        query |= Q(active_status=2)
-        query |= Q(active_status=3)
+        superuser_query &= Q(auth_user__is_superuser=False)
+        superuser_query |= Q(active_status=1)
+        superuser_query |= Q(active_status=2)
+        superuser_query |= Q(active_status=3)
     elif flag == 'ad':
-        query &= Q(auth_user__is_superuser=True)
+        superuser_query &= Q(auth_user__is_superuser=True)
     else:
-        query &= Q(auth_user__is_superuser=False)
-        query &= Q(active_status=0)
+        superuser_query &= Q(auth_user__is_superuser=False)
+        superuser_query &= Q(active_status=0)
     
-    query1 = Q()
+    search_query = Q()
     if search_select:
         valid_fields = {
             'name': 'auth_user__first_name__icontains',
@@ -55,26 +55,23 @@ def list(request, flag):
 
         if search_select == 'all':
             for val in valid_fields.values():
-                query1 |= Q(**{val: search_text})
+                search_query |= Q(**{val: search_text})
         else:
             search_field = valid_fields[search_select]
-            query1 = Q(**{search_field: search_text})
+            search_query = Q(**{search_field: search_text})
 
-    query2 = Q()
-    if start_date and end_date:
-        query2 &= Q(auth_user__date_joined__gte=start_date+" 00:00:00")
-        query2 &= Q(auth_user__date_joined__lte=end_date+" 23:59:59")
-    else:
-        one_month_ago = datetime.now() - timedelta(days=365)
-        query2 &= Q(auth_user__date_joined__gte=one_month_ago)
-        query2 &= Q(auth_user__date_joined__lte=datetime.now())
-        start_date = one_month_ago.strftime('%Y-%m-%d')
-        end_date = datetime.now().strftime('%Y-%m-%d')
+    date_query = Q()
+    if not (start_date and end_date):
+        one_month_ago = datetime.now() - timedelta(days=30)
+        start_date = one_month_ago.strftime("%Y-%m-%d")
+        end_date = datetime.now().strftime("%Y-%m-%d")
+
+    date_query = Q(auth_user__date_joined__range=[start_date+" 09:00:00", datetime.strptime(end_date+" 09:00:00", "%Y-%m-%d %H:%M:%S") + timedelta(days=1)])
 
     if flag == 'ad':
-        data = AdministratorProfile.objects.filter(query & query1 & query2)
+        data = AdministratorProfile.objects.filter(superuser_query & search_query & date_query)
     else:
-        data = CounselorProfile.objects.filter(query & query1 & query2)
+        data = CounselorProfile.objects.filter(superuser_query & search_query & date_query)
     
     paginator = Paginator(data, 10)
     page = request.GET.get('page')
@@ -402,8 +399,8 @@ def approve_user(request, id):
 def allow(request):
     search_select = request.GET.get("searchSelect", "")
     search_text = request.GET.get("searchText", "")
-    query = Q()
 
+    search_query = Q()
     if search_select:
         valid_fields = {
             'name': 'auth_user__first_name__icontains',
@@ -414,12 +411,12 @@ def allow(request):
         if search_select == 'all':
             for val in valid_fields.values():
                 print(val)
-                query |= Q(**{val: search_text})
+                search_query |= Q(**{val: search_text})
         else:
             search_field = valid_fields[search_select]
-            query = Q(**{search_field: search_text})
+            search_query = Q(**{search_field: search_text})
 
-    data = CounselorProfile.objects.select_related('auth_user').filter(query)
+    data = CounselorProfile.objects.select_related('auth_user').filter(search_query)
 
     context = {
         'data': data,
@@ -434,8 +431,8 @@ def allow(request):
 def inactive(request):
     search_select = request.GET.get("searchSelect", "")
     search_text = request.GET.get("searchText", "")
-    query = Q()
 
+    search_query = Q()
     if search_select:
         valid_fields = {
             'name': 'auth_user__first_name__icontains',
@@ -446,12 +443,12 @@ def inactive(request):
         if search_select == 'all':
             for val in valid_fields.values():
                 print(val)
-                query |= Q(**{val: search_text})
+                search_query |= Q(**{val: search_text})
         else:
             search_field = valid_fields[search_select]
-            query = Q(**{search_field: search_text})
+            search_query = Q(**{search_field: search_text})
 
-    data = CounselorProfile.objects.select_related('auth_user').filter(query)
+    data = CounselorProfile.objects.select_related('auth_user').filter(search_query)
 
     context = {
         'data': data,

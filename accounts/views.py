@@ -1,18 +1,17 @@
-from django.shortcuts import render, redirect
-from django.http import JsonResponse
-from .models import *
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
 from django.urls import reverse
-import logging
 from django.views.decorators.csrf import csrf_exempt
 
+from .models import *
 
-logger = logging.getLogger(__name__)
 
 @csrf_exempt
 def user_login(request):
     """
+        로그인
         request.method == 'GET': 접속
         request.method == 'POST': 로그인/관리자 로그인
         request.method == *: 잘못된 접근
@@ -30,7 +29,6 @@ def user_login(request):
         flag = request.POST.get('flag', None)
 
         user = authenticate(request, username=username, password=password)
-        logger.log(1, user)
 
         if user is not None:
             counselor = CounselorProfile.objects.filter(auth_user_id=user.id).first()
@@ -69,10 +67,17 @@ def user_logout(request):
 
 
 def consent(request):
+    """
+        회원 가입 전 이용 약관 페이지
+    """
     return render(request, 'accounts/consent.html')
+
 
 @csrf_exempt
 def signup(request):
+    """
+        회원 가입
+    """
     if request.method == 'GET':
         return render(request, 'accounts/signup.html')
     elif request.method == 'POST':
@@ -109,24 +114,39 @@ def signup(request):
 
         return JsonResponse({'result': result, 'msg': msg})
 
+
 @csrf_exempt
 def check_username(request):
+    """
+        ID 중복 확인
+    """
     username = request.POST.get('username')
     is_taken = User.objects.filter(username=username).exists()
-    print(is_taken)
     return JsonResponse({'is_taken': is_taken})
 
+
 def check_email(request):
+    """
+        email 중복 확인
+    """
     email = request.GET.get('email')
     is_taken = User.objects.filter(email=email).exists()
     return JsonResponse({'is_taken': is_taken})
 
-def check_phone(request): 
+
+def check_phone(request):
+    """
+    phone 중복 확인
+    """
     phone_number = request.GET.get('phone_number')
     is_taken = CounselorProfile.objects.filter(phone_number=phone_number).exists()
     return JsonResponse({'is_taken': is_taken})
 
+
 def searchPW(request):
+    """
+        비밀번호 찾기
+    """
     if request.method == 'POST':
         username = request.POST.get('username')
         birthdate = request.POST.get('birthdate')
@@ -142,7 +162,11 @@ def searchPW(request):
             return JsonResponse({'result': 'error', 'msg': '해당 정보의 사용자를 찾을 수 없습니다.'})
     return render(request, 'accounts/searchPW.html')
 
+
 def reset_password(request):
+    """
+    비밀번호 재설정
+    """
     if request.method == 'POST':
         new_password = request.POST.get('new_password')
         user_id = request.session.get('reset_user_id')

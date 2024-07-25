@@ -3,8 +3,8 @@
 {% block title %}회원정보 수정{% endblock %}
 
 {% block content %}
-<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script> <!-- Daum 우편번호 API -->
-<script src="{% static 'main/js/edit_profile.js' %}"></script> <!-- 수정 -->
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script src="{% static 'main/js/edit_profile.js' %}"></script>
 <div class="container-sm my_container">
     <h2>회원정보 수정</h2>
     <form id="editProfileForm" method="POST" data-url="{% url 'main:edit_profile' %}" data-csrf="{{ csrf_token }}">
@@ -34,18 +34,18 @@
             <label for="birth_date">생년월일</label>
         </div>
         <div class="form-floating mb-3 my-form" style="width: 100%; display: inline-flex;">
-            <input type="text" class="form-control" id="address_code" name="address_code" value="{{ profile.address_code }}"disabled>
+            <input type="text" class="form-control" id="address_code" name="address_code" value="{{ profile.address_code }}" disabled>
             <label for="address_code">우편번호</label>
-            <button type="button" class="btn btn-primary" onclick="execDaumPostcode()" style="width: 20%;">우편번호 찾기</button> <!-- 주소 찾기 버튼 -->
+            <button type="button" class="btn btn-primary" onclick="execDaumPostcode()" style="width: 20%;">우편번호 찾기</button>
         </div>
         <div class="form-floating mb-3 my-form">
-            <input type="text" class="form-control" id="address" name="address" value="{{ profile.address }}"disabled>
-            <label for="address">주소</label>        </div>
+            <input type="text" class="form-control" id="address" name="address" value="{{ profile.address }}" disabled>
+            <label for="address">주소</label>
+        </div>
         <div class="form-floating mb-3 my-form">
             <input type="text" class="form-control" id="address_detail" name="address_detail" value="{{ profile.address_detail }}">
             <label for="address_detail">상세 주소</label>
         </div>
-        <!-- 비밀번호 재설정 필드 추가 -->
         <div class="form-floating mb-3 my-form">
             <input type="password" class="form-control" id="password" name="password">
             <label for="password">새 비밀번호</label>

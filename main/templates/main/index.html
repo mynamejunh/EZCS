@@ -9,7 +9,7 @@
 <div class="dashboard dashboard-content">
     <div id="calendar" class="announcement-section calendar"></div>
     <div class="announcement-section notice">
-        <h2>공지 사항</h2>
+        <h2 style="text-align: center; font-size: 30px;">공지 사항</h2>
         <ul>
             {% for notice in notices %}
             <li>
@@ -55,14 +55,14 @@
 <div class="dimmed" id="dimmed" style="display: none;"></div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.open-popup').forEach(function(link) {
-            link.addEventListener('click', function(e) {
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.open-popup').forEach(function (link) {
+            link.addEventListener('click', function (e) {
                 e.preventDefault();
                 const url = this.getAttribute('data-modal-url');
                 const popup = document.getElementById('popup-container');
                 const dimmed = document.getElementById('dimmed');
-                
+
                 fetch(url)
                     .then(response => response.text())
                     .then(html => {

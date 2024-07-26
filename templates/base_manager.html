@@ -35,8 +35,40 @@
         }
     </script>
 </head>
+<style>
+    .load {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 60px;
+        z-index: 9999;
+        transition: all 0.3s;
+    }
+
+    img.infinite_rotating_logo {
+        animation: rotate_image 1s linear infinite;
+        transform-origin: 50% 50%;
+    }
+
+    @keyframes rotate_image {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
 
 <body>
+    <div id="load" class="load">
+        <img src="{% static 'images/favicon.png' %}" alt="load" style="width: 50px;" class="infinite_rotating_logo">
+    </div>
+
     <div class="header">
         <div class="company-name" style="font-size: x-large">관리자 페이지</div>
         <div class="header-right">
@@ -90,5 +122,11 @@
         </div>
     </div>
 </body>
+<script>
+    const loading_page = document.getElementById("load");
+    window.onload = function () {
+        loading_page.style.display = 'none';
+    }
+</script>
 
 </html>

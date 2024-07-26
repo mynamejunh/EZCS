@@ -9,26 +9,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from bs4 import BeautifulSoup
 from django.core.files.storage import default_storage
-import re
-import os
-
-def board_delete(request, id):
-    board = get_object_or_404(Board, id=id)
-    board.delete()
-    return redirect('management:board_list')
-
-def validate_image(file):
-    valid_mime_types = ['image/jpeg', 'image/png']
-    if file.content_type not in valid_mime_types:
-        raise ValidationError('jpg, jpeg, and png 파일만 업로드 가능합니다.')
 
 
-def mask_name(full_name):
-    if len(full_name) <= 2:
-        return full_name[:-1] + '*'
-    else:
-        return full_name[0] + '*' * (len(full_name) - 2) + full_name[-1]
-    
 def list(request, flag):
     search_select = request.GET.get("searchSelect", "")
     search_text = request.GET.get("searchText", "")
@@ -94,11 +76,86 @@ def list(request, flag):
 
     return render(request, 'management/list.html', context)
 
+
+def detail(request, id, flag):
+    """
+    유저 상세 페이지
+    
+    """
+    if flag == 'ad':
+        data = get_object_or_404(AdministratorProfile, id=id)
+    else:
+        data = get_object_or_404(CounselorProfile, id=id)
+
+    context = {
+        'flag': flag,
+        'data': data
+    }
+    return render(request, 'management/detail.html', context)
+
+
+def edit(request, id, flag):
+    """
+    개인정보 수정
+    """
+    if flag == 'ad':
+        user_profile = get_object_or_404(AdministratorProfile, id=id)
+    else:
+        user_profile = get_object_or_404(CounselorProfile, id=id)
+        
+    auth_user = user_profile.auth_user
+    
+    if request.method == 'GET':
+        context = {
+            'flag': flag,
+            'user': user_profile
+        }
+        return render(request, 'management/edit.html', context)
+    else:
+        auth_user.username = request.POST.get('loginUsername')
+        auth_user.first_name = request.POST.get('name')
+        auth_user.email = request.POST.get('emailLocal') + '@' + request.POST.get('emailDomain')
+        user_profile.phone_number = request.POST.get('phone')
+        user_profile.department = request.POST.get('department')
+        user_profile.birth_date = request.POST.get('birth_date')
+        user_profile.address_code = request.POST.get('addressCode')
+        user_profile.address = request.POST.get('address')
+        user_profile.address_detail = request.POST.get('addressDetail')
+        user_profile.active_status = request.POST.get('active_status')
+        user_profile.save()
+        auth_user.save()
+        return redirect("management:detail", id=id, flag=flag)
+    
+    
+
+
+def board_delete(request, id):
+    board = get_object_or_404(Board, id=id)
+    if board.file:
+        if board.file and default_storage.exists(board.file.name):
+            default_storage.delete(board.file.name)
+    board.delete()
+    return redirect('management:board_list')
+
+def validate_image(file):
+    valid_mime_types = ['image/jpeg', 'image/png']
+    if file.content_type not in valid_mime_types:
+        raise ValidationError('jpg, jpeg, and png 파일만 업로드 가능합니다.')
+
+
+def mask_name(full_name):
+    if len(full_name) <= 2:
+        return full_name[:-1] + '*'
+    else:
+        return full_name[0] + '*' * (len(full_name) - 2) + full_name[-1]
+    
+
+
 def board_create(request):
     if request.method == 'POST':
         title = request.POST.get('title')
         body = request.POST.get('body')
-        flag = request.POST.get('flag', 0)  # 기본값으로 활성화 상태 설정
+        flag = request.POST.get('flag', 0)
 
         # 파일 형식 검증
         if 'file' in request.FILES:
@@ -194,6 +251,12 @@ def board_edit(request, id):
         flag = request.POST.get('flag')
         file = request.FILES.get('file')
         
+        if 'file' in request.FILES:
+            file = request.FILES['file']
+            file_extension = file.name.split('.')[-1].lower()
+            if file_extension not in ['jpg', 'jpeg', 'png']:
+                return render(request, 'management/board_detail.html', {'error': '파일 형식이 유효하지 않습니다. jpg, jpeg, png 형식만 업로드 가능합니다.'})
+            
         board.title = title
         board.body = body
         board.flag = flag
@@ -201,27 +264,15 @@ def board_edit(request, id):
         if file:
             if board.file and default_storage.exists(board.file.name):
                 default_storage.delete(board.file.name)
-            board.file = file
+            if 'file' in request.FILES:
+                board.file = request.FILES['file']
+                board.save()
         
         board.save()
         return redirect('management:board_detail', id=board.id)
-    return render(request, 'management/board_detail.html', {'board': board})
+    return render(request, 'management/board_edit.html', {'board': board})
 
-def detail(request, id, flag):
-    """
-    유저 상세 페이지
-    
-    """
-    if flag == 'ad':
-        data = get_object_or_404(AdministratorProfile, id=id)
-    else:
-        data = get_object_or_404(CounselorProfile, id=id)
 
-    context = {
-        'flag': flag,
-        'data': data
-    }
-    return render(request, 'management/detail.html', context)
 
 def update_auth(request, id, status):
     """
@@ -238,37 +289,7 @@ def update_auth(request, id, status):
     return redirect('management:list', flag)
 
 
-def edit(request, id, flag):
-    """
-    개인정보 수정
-    """
-    if flag == 'ad':
-        user_profile = get_object_or_404(AdministratorProfile, id=id)
-    else:
-        user_profile = get_object_or_404(CounselorProfile, id=id)
-        
-    auth_user = user_profile.auth_user
-    
-    if request.method == 'GET':
-        context = {
-            'flag': flag,
-            'user': user_profile
-        }
-        return render(request, 'management/edit.html', context)
-    else:
-        auth_user.username = request.POST.get('loginUsername')
-        auth_user.first_name = request.POST.get('name')
-        auth_user.email = request.POST.get('emailLocal') + '@' + request.POST.get('emailDomain')
-        user_profile.phone_number = request.POST.get('phone')
-        user_profile.department = request.POST.get('department')
-        user_profile.birth_date = request.POST.get('birth_date')
-        user_profile.address_code = request.POST.get('addressCode')
-        user_profile.address = request.POST.get('address')
-        user_profile.address_detail = request.POST.get('addressDetail')
-        user_profile.active_status = request.POST.get('active_status')
-        user_profile.save()
-        auth_user.save()
-        return redirect("management:detail", id=id, flag=flag)
+
 
 @csrf_exempt
 def adminsignup(request):

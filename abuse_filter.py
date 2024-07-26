@@ -21,4 +21,3 @@ class AbuseFilter:
 
 if __name__ == "__main__":
     abuse_filter = AbuseFilter()
-    print(abuse_filter.abuse_clean("안녕하세요. 나는 바보입니다."))

@@ -87,7 +87,7 @@
                     {% endfor %}
                     {% else %}
                     <tr>
-                        <td class="noneDataRow" colspan="{% if request.user.is_superuser %}9{% else %}10{% endif %}">AI 트레이너 이력이 없습니다.</td>
+                        <td class="noneDataRow" colspan="{% if request.user.is_superuser %}10{% else %}9{% endif %}">AI 트레이너 이력이 없습니다.</td>
                     </tr>
                     {% endif %}
                 </tbody>

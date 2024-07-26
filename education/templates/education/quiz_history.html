@@ -83,7 +83,7 @@
                     {% endfor %}
                     {% else %}
                     <tr>
-                        <td class="noneDataRow" colspan="{% if request.user.is_superuser %}4{% else %}5{% endif %}">퀴즈 이력이 없습니다.</td>
+                        <td class="noneDataRow" colspan="{% if request.user.is_superuser %}5{% else %}4{% endif %}">퀴즈 이력이 없습니다.</td>
                     </tr>
                     {% endif %}
                 </tbody>

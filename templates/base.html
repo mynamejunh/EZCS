@@ -26,15 +26,23 @@
                 <li class="has-submenu">
                     <a href="{% url 'counseling:counsel' %}" class="{% if request.path == '/counseling/' %}active{% endif %}">AI 상담</a>
                     <ul class="submenu">
-                        <li><a href="{% url 'counseling:history' %}" class="{% if request.path == '/counseling/history/' %}active{% endif %}">AI 상담 이력</a></li>
+                        <li>
+                            <a href="{% url 'counseling:history' %}" class="{% if request.path == '/counseling/history/' or '/counseling/detail/' in request.path %}active{% endif %}">AI 상담 이력</a>
+                        </li>
                     </ul>
                 </li>
                 <li class="has-submenu">
                     <a href="{% url 'education:chat_view' %}" class="{% if request.path == '/education/' %}active{% endif %}">AI 트레이너</a>
                     <ul class="submenu">
-                        <li><a href="{% url 'education:edu_history' %}" class="{% if request.path == '/education/edu_history/' %}active{% endif %}">AI 트레이너 이력</a></li>
-                        <li><a href="{% url 'education:quiz' %}" class="{% if request.path == '/education/quiz/' %}active{% endif %}">퀴즈</a></li>
-                        <li><a href="{% url 'education:quiz_history' %}" class="{% if request.path == '/education/quiz_history/' %}active{% endif %}">퀴즈 이력</a></li>
+                        <li>
+                            <a href="{% url 'education:edu_history' %}" class="{% if request.path == '/education/edu_history/' or 'education/edu_details' in request.path %}active{% endif %}">AI 트레이너 이력</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'education:quiz' %}" class="{% if request.path == '/education/quiz/' %}active{% endif %}">퀴즈</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'education:quiz_history' %}" class="{% if request.path == '/education/quiz_history/' or 'education/quiz_details' in request.path %}active{% endif %}">퀴즈 이력</a>
+                        </li>
                     </ul>
                 </li>
             </ul>

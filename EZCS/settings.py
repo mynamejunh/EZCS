@@ -86,7 +86,7 @@ WSGI_APPLICATION = "EZCS.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': os.getenv('MySQL_DB', 'ezcs'),
+        'NAME': os.getenv('MySQL_DB', 'EZCS'),
         'USER': os.getenv('MySQL_ID', 'root'),
         'PASSWORD': os.getenv('MySQL_PW', 'root'),
         'HOST': os.getenv('MySQL_HOST', 'localhost'),

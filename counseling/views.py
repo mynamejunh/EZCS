@@ -1,35 +1,31 @@
-from django.shortcuts import render
-from django.http import JsonResponse
+import random
+import json
+
 from chat import Chatbot
 from chat_trans import Chatbot_trans
-from django.views.decorators.csrf import csrf_exempt
-import logging
-from .models import *
-from django.db.models import Q
-import json
-from django.core.paginator import Paginator
-import random
-from django.conf import settings
-from datetime import datetime, timedelta
-from abuse_filter import AbuseFilter
 from prompt import Prompt
 
+from datetime import datetime, timedelta
+
+from django.core.paginator import Paginator
+from django.db.models import Q
+from django.shortcuts import render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+from abuse_filter import AbuseFilter
+from .models import *
 
 
-logger = logging.getLogger(__name__)
 abuse_filter = AbuseFilter()
-
-
 prompt = Prompt()
-
-
 trans_chat_bot = None
 recommend_chat_bot = None
 
 
 def counsel(request):
     """
-    상담 페이지
+        AI 상담
     """
     if request.method == "POST":
         global trans_chat_bot, recommend_chat_bot
@@ -42,9 +38,7 @@ def counsel(request):
             behavior_policy=prompt.get_behavior_policy_for_trans(),
         )
 
-
         recommend_chat_bot = Chatbot(behavior_policy=prompt.get_behavior_policy_for_recommend(), k=1)
-
 
         return render(request, "counseling/index.html", context)
 
@@ -87,7 +81,22 @@ def update_log(request):
     return JsonResponse({"error": "Invalid request"}, status=400)
 
 
+def delete_counseling_init_data(request):
+    """
+        상담 초기만 존재하는 데이터 삭제
+    """
+    if request.method == "POST":
+        id = request.POST.get('id')
+        LogItem.objects.filter(log=id).delete()
+        Log.objects.filter(id=id).delete()
+        return JsonResponse({"response": "True"})
+    return JsonResponse({"response": "False"})
+
+
 def ai_model(request):
+    """
+        대화 내용 INSERT
+    """
     if request.method == "POST":
         classify = request.POST.get("classify")
         message = request.POST.get("message")
@@ -114,11 +123,6 @@ def ai_model(request):
 
     return JsonResponse({"error": "Invalid request"}, status=400)
 
-def mask_name(full_name):
-    if len(full_name) > 1:
-        return full_name[:-1] + '*'
-    return full_name
-
 
 def history(request):
     """
@@ -130,11 +134,11 @@ def history(request):
     start_date = request.GET.get("startDate", "")
     end_date = request.GET.get("endDate", "")
 
-    query = Q()
+    superuser_query = Q()
     if not request.user.is_superuser:
-        query = Q(auth_user=request.user.id)
+        superuser_query = Q(auth_user=request.user.id)
 
-    query1 = Q()
+    search_query = Q()
     if search_select:
         valid_fields = {
             '1': 'customer__name__icontains',
@@ -144,23 +148,20 @@ def history(request):
 
         if search_select == '0':
             for val in valid_fields.values():
-                query1 |= Q(**{val: search_text})
+                search_query |= Q(**{val: search_text})
         else:
             search_field = valid_fields[search_select]
-            query1 = Q(**{search_field: search_text})
+            search_query = Q(**{search_field: search_text})
 
-    query2 = Q()
-    if start_date and end_date:
-        query2 &= Q(create_time__gte=start_date+" 00:00:00")
-        query2 &= Q(create_time__lte=end_date+" 23:59:59")
-    else:
+    date_query = Q()
+    if not (start_date and end_date):
         one_month_ago = datetime.now() - timedelta(days=30)
-        query2 &= Q(create_time__gte=one_month_ago)
-        query2 &= Q(create_time__lte=datetime.now())
         start_date = one_month_ago.strftime("%Y-%m-%d")
         end_date = datetime.now().strftime("%Y-%m-%d")
 
-    data = Log.objects.filter(query & query1 & query2).order_by("-create_time", "customer_id", "auth_user_id")
+    date_query = Q(create_time__range=[start_date+" 09:00:00", datetime.strptime(end_date+" 09:00:00", "%Y-%m-%d %H:%M:%S") + timedelta(days=1)])
+
+    data = Log.objects.filter(superuser_query & search_query & date_query).order_by("-create_time", "customer_id", "auth_user_id")
 
     paginator = Paginator(data, 10)
     page = request.GET.get("page")
@@ -169,7 +170,6 @@ def history(request):
     for log in data:
         log.masked_name = mask_name(log.customer.name)
 
-        
     context = {
         "data": data,
         "searchSelect": search_select,
@@ -178,160 +178,25 @@ def history(request):
         "endDate": end_date,
         "is_paginated": data.has_other_pages(),
     }
+
     return render(request, "counseling/history.html", context)
 
 
 def detail(request, id):
+    """
+        AI 상담 이력 상세 페이지
+    """
     head = Log.objects.get(id=id)
     data = LogItem.objects.filter(log_id=id)
     context = {"head": head, "data": data}
     return render(request, "counseling/detail.html", context)
 
 
-def list(request):
-    customer = CustomerProfile.objects.order_by("?").first()
-
-    if customer:
-        # 선택된 고객의 상담 기록을 모두 가져오기
-        log = Log.objects.filter(customer=customer)
-
-        if log:
-            # 랜덤으로 상담 기록 중 하나를 선택
-            random_counsel_log = random.choice(log)
-
-            try:
-                if isinstance(random_counsel_log.memo, str):
-                    memo_json = json.loads(
-                        random_counsel_log.memo
-                    )  # memo 필드를 JSON 형식으로 파싱
-                elif isinstance(random_counsel_log.memo, dict):
-                    memo_json = random_counsel_log.memo
-                else:
-                    memo_json = {}
-                random_counsel_log.inquiry_text = memo_json.get("inquiry_text", "")
-                random_counsel_log.action_text = memo_json.get("action_text", "")
-            except (TypeError, json.JSONDecodeError) as e:
-                print(f"Error parsing memo for log {random_counsel_log.id}: {e}")
-                random_counsel_log.inquiry_text = ""
-                random_counsel_log.action_text = ""
-
-            context = {
-                "customer": customer,
-                "counsel_logs": [random_counsel_log],  # 리스트로 전달
-            }
-        else:
-            # 상담 기록이 없는 경우 빈 리스트 전달
-            context = {"customer": customer, "counsel_logs": []}
+def mask_name(full_name):
+    """
+        이름 마스킹
+    """
+    if len(full_name) <= 2:
+        return full_name[:-1] + '*'
     else:
-        # 고객 정보가 없는 경우 빈 리스트 전달
-        context = {"customer_info": None, "counsel_logs": []}
-
-    return render(request, "counseling/index.html", context)
-
-
-@csrf_exempt
-def save_counseling_log(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body.decode("utf-8"))
-
-            username = data.get("username")
-            phone_number_str = data.get("phone_number")
-
-            try:
-                phone_number = CustomerProfile.objects.get(
-                    phone_number=phone_number_str
-                )
-            except CustomerProfile.DoesNotExist:
-                return JsonResponse(
-                    {"success": False, "error": "CustomerProfile not found"}
-                )
-
-            chat_data = json.dumps(data.get("chat_data", {}), ensure_ascii=False)
-            memo_data = json.dumps(data.get("memo_data", {}), ensure_ascii=False)
-
-            print(f"Username: {username}")
-            print(f"Phone Number: {phone_number}")
-            print(f"Chat Data: {chat_data}")
-            print(f"Memo Data: {memo_data}")
-
-            counselLog = Log(
-                username=username,
-                phone_number=phone_number,
-                body=chat_data,
-                memo=memo_data,
-            )
-            counselLog.save()
-
-            return JsonResponse({"success": True})
-        except Exception as e:
-            print(f"Error: {str(e)}")
-            return JsonResponse({"success": False, "error": str(e)})
-
-    return JsonResponse({"error": "Invalid request"}, status=400)
-
-
-@csrf_exempt
-def save_consultation(request):
-    if request.method == "POST":
-        try:
-            log_id = request.POST.get("log_id")
-            inquiry_text = request.POST.get("inquiry_text")
-            action_text = request.POST.get("action_text")
-
-            if log_id and (inquiry_text or action_text):
-                counsel_log = Log.objects.get(id=log_id)
-                memo = (
-                    json.loads(counsel_log.memo)
-                    if isinstance(counsel_log.memo, str)
-                    else counsel_log.memo or {}
-                )
-                memo["inquiry_text"] = inquiry_text
-                memo["action_text"] = action_text
-                counsel_log.memo = json.dumps(memo, ensure_ascii=False)
-                counsel_log.save()
-
-                return JsonResponse({"success": True})
-            else:
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "error": "Missing log_id, inquiry_text, or action_text",
-                    }
-                )
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
-    return JsonResponse({"success": False, "error": "Invalid request"})
-
-
-@csrf_exempt
-def save_consultation(request):
-    if request.method == "POST":
-        try:
-            log_id = request.POST.get("log_id")
-            inquiry_text = request.POST.get("inquiry_text")
-            action_text = request.POST.get("action_text")
-
-            if log_id and (inquiry_text or action_text):
-                counsel_log = Log.objects.get(id=log_id)
-                memo = (
-                    json.loads(counsel_log.memo)
-                    if isinstance(counsel_log.memo, str)
-                    else counsel_log.memo or {}
-                )
-                memo["inquiry_text"] = inquiry_text
-                memo["action_text"] = action_text
-                counsel_log.memo = json.dumps(memo, ensure_ascii=False)
-                counsel_log.save()
-
-                return JsonResponse({"success": True})
-            else:
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "error": "Missing log_id, inquiry_text, or action_text",
-                    }
-                )
-        except Exception as e:
-            return JsonResponse({"success": False, "error": str(e)})
-    return JsonResponse({"success": False, "error": "Invalid request"})
+        return full_name[0] + '*' * (len(full_name) - 2) + full_name[-1]

@@ -4,13 +4,16 @@ from . import views
 app_name = 'education'
 
 urlpatterns = [
-    # 롤플레잉=교육 페이지
+    # AI 트레이너 페이지
     path('', views.chat_view, name='chat_view'),
 
-    # 교육 이력 페이지
+    # AI 트레이너 바로 종료 시 데이터 삭제
+    path('del_train_data', views.delete_training_init_data, name='delTrainData'),
+
+    # AI 트레이너 이력 페이지
     path('edu_history/', views.edu_history, name='edu_history'),
 
-    # 교육이력 상세 페이지
+    # AI 트레이너이력 상세 페이지
     path('edu_details/<int:id>/', views.edu_details, name='edu_details'),
 
     # 퀴즈 페이지 

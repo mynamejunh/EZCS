@@ -9,10 +9,14 @@
         <meta charset="UTF-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}EZCS{% endblock %}</title>
+
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <link href="/static/css/bootstrap/bootstrap.min.css" rel="stylesheet" />
         <script src="/static/js/bootstrap/bootstrap.bundle.min.js"></script>
         {% load static %}
+        <link rel="icon" href="{% static 'images/favicon.png' %}" />
+        <link rel="apple-touch-icon" href="{% static 'images/favicon.png' %}" />
         <link href="{% static 'accounts\css\login.css' %}" rel="stylesheet" />
         <script src="{% static 'accounts\js\login.js' %}"></script>
 
@@ -53,10 +57,41 @@
             -moz-box-shadow: 0 8px 20px 0 rgba(0, 0, 0, 0.15);
             box-shadow: 0 8px 20px 0 rgba(0, 0, 0, 0.15)
         }
+
+        .load {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            z-index: 9999;
+            transition: all 0.3s;
+        }
+
+        img.infinite_rotating_logo {
+            animation: rotate_image 1s linear infinite;
+            transform-origin: 50% 50%;
+        }
+
+        @keyframes rotate_image {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
 <body>
+    <div id="load" class="load">
+        <img src="{% static 'images/favicon.png' %}" alt="load" style="width: 50px;" class="infinite_rotating_logo">
+    </div>
+
     <div class="container-fluid">
         <img src="{% static 'main/images/EZCS.png' %}" alt="EZCS Logo" class="ezcs-logo"></a>
         {% block content %}
@@ -78,6 +113,11 @@
     }
     {% endif %}
     });
+
+    const loading_page = document.getElementById("load");
+    window.onload = function () {
+        loading_page.style.display = 'none';
+    }
 </script>
 
 </html>

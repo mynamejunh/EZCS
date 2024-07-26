@@ -9,6 +9,7 @@
 <h2>직원 정보 수정</h2>
 <form id="frm" action="{% url 'management:edit' user.id flag %}" method="POST">
     {% csrf_token %}
+    <input type="hidden" name="csrf" id="csrf" value="{{ csrf_token }}">
     <table class="styled-table-deail">
         <colgroup>
             <col width="15%">
@@ -23,7 +24,7 @@
                         <div id="usernameVaild" class="valid-feedback"></div>
                         <div id="usernameError" class="invalid-feedback"></div>
                         <input type="hidden" name="usernameChk" id="usernameChk" value="{{ user.auth_user.username }}">
-                        <input type="hidden" name="usernameChkUrl" id="usernameChkUrl" value="">
+                        <input type="hidden" name="usernameChkUrl" id="usernameChkUrl" value="{% url 'accounts:check_username' %}">
                     </div>
                     <div style="padding: 0;">
                         <input type="button" class="btn btn-sm btn-primary" value="중복 확인" data-url="{% url 'accounts:check_username' %}" onclick="chkUserName(this);">
@@ -99,7 +100,7 @@
                         <option value="4" {% if user.active_status == 4 %}selected{% endif %}>Rejection</option>
                     </select>
                 </td>
-                {% endif %}  
+                {% endif %}
             </tr>
         </tbody>
     </table>

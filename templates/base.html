@@ -6,42 +6,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}EZCS{% endblock %}</title>
     {% load static %}
+    <link rel="icon" href="{% static 'images/favicon.png' %}" />
+    <link rel="apple-touch-icon" href="{% static 'images/favicon.png' %}" />
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link href="{% static 'css/bootstrap/bootstrap.min.css' %}" rel="stylesheet" />
     <script src="{% static 'js/bootstrap/bootstrap.bundle.min.js' %}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-        function openContractPopup() {
-            var width = 800;
-            var height = 600;
-            var left = (screen.width - width) / 2;
-            var top = (screen.height - height) / 2;
-            window.open("{% url 'main:contract' %}", "Terms and Conditions", "width=" + width + ",height=" + height + ",top=" + top + ",left=" + left);
-        }
-
-        function openPrivacyPopup() {
-            var width = 800;
-            var height = 600;
-            var left = (screen.width - width) / 2;
-            var top = (screen.height - height) / 2;
-            window.open("{% url 'main:privacy' %}", "Privacy Policy", "width=" + width + ",height=" + height + ",top=" + top + ",left=" + left);
-        }
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('hidden');
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            if (sidebarToggle) {
-                sidebarToggle.addEventListener('click', toggleSidebar);
-            }
-        });
-    </script>
 </head>
 
+<style>
+    .load {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 60px;
+        z-index: 9999;
+        transition: all 0.3s;
+    }
+
+    img.infinite_rotating_logo {
+        animation: rotate_image 1s linear infinite;
+        transform-origin: 50% 50%;
+    }
+
+    @keyframes rotate_image {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
 <body>
+    <div id="load" class="load">
+        <img src="{% static 'images/favicon.png' %}" alt="load" style="width: 50px;" class="infinite_rotating_logo">
+    </div>
+
     <div class="sidebar" id="sidebar">
         <div>
             <a href="{% url 'main:user_dashboard' %}"><img src="{% static 'main/images/EZCS.png' %}" alt="EZCS Logo" class="ezcs-logo"></a>
@@ -53,17 +59,23 @@
                 <li class="has-submenu">
                     <a href="{% url 'counseling:counsel' %}" class="{% if request.path == '/counseling/' %}active{% endif %}">AI 상담</a>
                     <ul class="submenu">
-                        <li><a href="{% url 'counseling:history' %}" class="{% if request.path == '/counseling/history/' %}active{% endif %}">AI 상담 이력</a></li>
+                        <li>
+                            <a href="{% url 'counseling:history' %}" class="{% if request.path == '/counseling/history/' or '/counseling/detail/' in request.path %}active{% endif %}">AI 상담 이력</a>
+                        </li>
                     </ul>
                 </li>
                 <li class="has-submenu">
                     <a href="{% url 'education:chat_view' %}" class="{% if request.path == '/education/' %}active{% endif %}">AI 트레이너</a>
                     <ul class="submenu">
-                        <li><a href="{% url 'education:edu_history' %}" class="{% if request.path == '/education/edu_history/' %}active{% endif %}">AI 트레이너 이력</a></li>
-                        {% comment %} <li><a href="{% url 'education:edu_details' %}" class="{% if request.path == '/education/edu_details/' %}active{% endif %}">AI 트레이너 이력 상세(개발용)</a></li> {% endcomment %}
-                        <li><a href="{% url 'education:quiz' %}" class="{% if request.path == '/education/quiz/' %}active{% endif %}">퀴즈</a></li>
-                        <li><a href="{% url 'education:quiz_history' %}" class="{% if request.path == '/education/quiz_history/' %}active{% endif %}">퀴즈 이력</a></li>
-                        {% comment %} <li><a href="{% url 'education:quiz_details' %}" class="{% if request.path == '/education/quiz_details/' %}active{% endif %}">퀴즈 이력 상세</a></li> {% endcomment %}
+                        <li>
+                            <a href="{% url 'education:edu_history' %}" class="{% if request.path == '/education/edu_history/' or 'education/edu_details' in request.path %}active{% endif %}">AI 트레이너 이력</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'education:quiz' %}" class="{% if request.path == '/education/quiz/' %}active{% endif %}">퀴즈</a>
+                        </li>
+                        <li>
+                            <a href="{% url 'education:quiz_history' %}" class="{% if request.path == '/education/quiz_history/' or 'education/quiz_details' in request.path %}active{% endif %}">퀴즈 이력</a>
+                        </li>
                     </ul>
                 </li>
             </ul>
@@ -80,7 +92,6 @@
         <div class="header">
             <button class="sidebar-toggle" id="sidebarToggle">☰</button>
             <div class="header-right">
-                {% comment %} <div class="profile-info">{{ request.session.user }}님, 오늘 하루도 화이팅 하세요.</div> {% endcomment %}
                 <div class="profile-info">{{ request.user }}님, 오늘 하루도 화이팅 하세요.</div>
                 {% if request.user.is_superuser %}
                 <div class="admin-page">
@@ -126,7 +137,16 @@
             </div>
         </div>
     </div>
+    <link href='https://unpkg.com/fullcalendar@5.11.0/main.min.css' rel='stylesheet' />
+    <script src='https://unpkg.com/fullcalendar@5.11.0/main.min.js'></script>
+    <script src='https://unpkg.com/fullcalendar@5.11.0/locales/ko.js'></script>
     <script src="{% static 'js/scripts.js' %}"></script>
 </body>
+<script>
+    const loading_page = document.getElementById("load");
+    window.onload = function () {
+        loading_page.style.display = 'none';
+    }
+</script>
 
 </html>

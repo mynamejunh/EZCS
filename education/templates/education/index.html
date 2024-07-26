@@ -8,6 +8,7 @@
 <input type="hidden" name="csrf" id="csrf" value="{{ csrf_token }}">
 <input type="hidden" name="log-header" id="log-header" value="">
 <input type="hidden" name="category-selected" id="category-selected" value="">
+<input type="hidden" name="delUrl" id="delUrl" value="{% url 'education:delTrainData' %}">
 
 <div class="loading" style="display: none;">
     <img src="/static/main/images/loading.gif" />
@@ -38,7 +39,7 @@
         <div class="chat-header">
             <span>선택된 카테고리: </span><span id="selected-category"></span>
             <div class="form-check form-switch my-form">
-                <input class="form-check-input" type="checkbox" role="switch" id="soundOnOff" name="soundOnOff" onchange="soundChange(this);">
+                <input class="form-check-input" type="checkbox" role="switch" id="soundOnOff" name="soundOnOff" checked onchange="soundChange(this);">
                 <label class="form-check-label" for="soundOnOff">소리</label>
             </div>
         </div>

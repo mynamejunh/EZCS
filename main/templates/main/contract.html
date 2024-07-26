@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}이용 약관{% endblock %}</title>
     {% load static %}
+    <link rel="icon" href="{% static 'images/favicon.png' %}" />
+    <link rel="apple-touch-icon" href="{% static 'images/favicon.png' %}" />
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 
     <style>
@@ -115,13 +117,11 @@
         <div class="page_title">
             <h2>이용 약관</h2>
             <div>
-                <!-- -->
                 <div class="card">
                     <div class="hd">
                         <h3>이용 약관</h3>
                         <p>쉽고 편리한 온라인 서비스를 제공하겠습니다.</p>
                     </div>
-                    <!-- -->
                     <div class="con">
                         <ol>
                             <li>
@@ -562,9 +562,7 @@
                             </li>
                         </ol>
                     </div>
-                    <!-- // -->
                 </div>
-                <!-- // -->
             </div>
         </div>
 </body>

@@ -13,7 +13,7 @@
 <form id="frm" name="frm" action="{% url 'management:board_list' %}" method="GET">
     <div class="dashboard">
         <div>
-            <h2>공지 사항 목록</h2>
+            <h2 style="font-weight: bold;">공지 사항 목록</h2>
         </div>
         <a href="{% url 'management:board_create' %}" class="btn btn-primary mb-3" style="float: right; margin-top: 10px;">공지 사항 작성</a>
         <div>
@@ -81,7 +81,7 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan=4>등록된 공지 사항이 없습니다.</td>
+                        <td colspan=6>등록된 공지 사항이 없습니다.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

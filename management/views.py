@@ -8,44 +8,31 @@ from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from bs4 import BeautifulSoup
+from django.core.files.storage import default_storage
 
 
-def board_delete(request, id):
-    board = get_object_or_404(Board, id=id)
-    board.delete()
-    return redirect('management:board_list')
-
-def validate_image(file):
-    valid_mime_types = ['image/jpeg', 'image/png']
-    if file.content_type not in valid_mime_types:
-        raise ValidationError('jpg, jpeg, and png 파일만 업로드 가능합니다.')
-
-
-def mask_name(full_name):
-    if len(full_name) <= 2:
-        return full_name[:-1] + '*'
-    else:
-        return full_name[0] + '*' * (len(full_name) - 2) + full_name[-1]
-    
 def list(request, flag):
+    """
+    직원 관리 페이지
+    """
     search_select = request.GET.get("searchSelect", "")
     search_text = request.GET.get("searchText", "")
     start_date = request.GET.get("startDate", "")
     end_date = request.GET.get("endDate", "")
-    query = Q()
+    superuser_query = Q()
 
     if flag == 'm':
-        query &= Q(auth_user__is_superuser=False)
-        query |= Q(active_status=1)
-        query |= Q(active_status=2)
-        query |= Q(active_status=3)
+        superuser_query &= Q(auth_user__is_superuser=False)
+        superuser_query |= Q(active_status=1)
+        superuser_query |= Q(active_status=2)
+        superuser_query |= Q(active_status=3)
     elif flag == 'ad':
-        query &= Q(auth_user__is_superuser=True)
+        superuser_query &= Q(auth_user__is_superuser=True)
     else:
-        query &= Q(auth_user__is_superuser=False)
-        query &= Q(active_status=0)
+        superuser_query &= Q(auth_user__is_superuser=False)
+        superuser_query &= Q(active_status=0)
     
-    query1 = Q()
+    search_query = Q()
     if search_select:
         valid_fields = {
             'name': 'auth_user__first_name__icontains',
@@ -55,26 +42,23 @@ def list(request, flag):
 
         if search_select == 'all':
             for val in valid_fields.values():
-                query1 |= Q(**{val: search_text})
+                search_query |= Q(**{val: search_text})
         else:
             search_field = valid_fields[search_select]
-            query1 = Q(**{search_field: search_text})
+            search_query = Q(**{search_field: search_text})
 
-    query2 = Q()
-    if start_date and end_date:
-        query2 &= Q(auth_user__date_joined__gte=start_date+" 00:00:00")
-        query2 &= Q(auth_user__date_joined__lte=end_date+" 23:59:59")
-    else:
-        one_month_ago = datetime.now() - timedelta(days=365)
-        query2 &= Q(auth_user__date_joined__gte=one_month_ago)
-        query2 &= Q(auth_user__date_joined__lte=datetime.now())
-        start_date = one_month_ago.strftime('%Y-%m-%d')
-        end_date = datetime.now().strftime('%Y-%m-%d')
+    date_query = Q()
+    if not (start_date and end_date):
+        one_month_ago = datetime.now() - timedelta(days=30)
+        start_date = one_month_ago.strftime("%Y-%m-%d")
+        end_date = datetime.now().strftime("%Y-%m-%d")
+
+    date_query = Q(auth_user__date_joined__range=[start_date+" 09:00:00", datetime.strptime(end_date+" 09:00:00", "%Y-%m-%d %H:%M:%S") + timedelta(days=1)])
 
     if flag == 'ad':
-        data = AdministratorProfile.objects.filter(query & query1 & query2)
+        data = AdministratorProfile.objects.filter(superuser_query & search_query & date_query)
     else:
-        data = CounselorProfile.objects.filter(query & query1 & query2)
+        data = CounselorProfile.objects.filter(superuser_query & search_query & date_query)
     
     paginator = Paginator(data, 10)
     page = request.GET.get('page')
@@ -95,100 +79,6 @@ def list(request, flag):
 
     return render(request, 'management/list.html', context)
 
-def board_create(request):
-    if request.method == 'POST':
-        title = request.POST.get('title')
-        body = request.POST.get('body')
-        flag = request.POST.get('flag', 0)  # 기본값으로 활성화 상태 설정
-
-        # 파일 형식 검증
-        if 'file' in request.FILES:
-            file = request.FILES['file']
-            file_extension = file.name.split('.')[-1].lower()
-            if file_extension not in ['jpg', 'jpeg', 'png']:
-                return render(request, 'management/board_create.html', {'error': '파일 형식이 유효하지 않습니다. jpg, jpeg, png 형식만 업로드 가능합니다.'})
-
-        board = Board.objects.create(
-            auth_user=request.user,
-            title=title,
-            body=body,
-            flag=flag
-        )
-
-        if 'file' in request.FILES:
-            board.file = request.FILES['file']
-            board.save()
-
-        return redirect('management:board_list')  # 공지사항 목록 페이지로 리디렉션
-    return render(request, 'management/board_create.html')
-
-def board_list(request):
-    search_select = request.GET.get("searchSelect", "")
-    search_text = request.GET.get("searchText", "")
-    start_date = request.GET.get("startDate", "")
-    end_date = request.GET.get("endDate", "")
-
-    search_query = Q()
-    if search_select:
-        valid_fields = {
-            '1': 'title__icontains',
-            '2': 'body__icontains',
-            '3': 'auth_user__first_name__icontains',
-        }
-
-        if search_select == '0':
-            for val in valid_fields.values():
-                search_query |= Q(**{val: search_text})
-        else:
-            search_field = valid_fields[search_select]
-            search_query = Q(**{search_field: search_text})
-
-    date_query = Q()
-    if start_date and end_date:
-        date_query &= Q(update_time__gte=start_date+" 00:00:00")
-        date_query &= Q(update_time__lte=end_date+" 23:59:59")
-    else:
-        one_month_ago = datetime.now() - timedelta(days=30)
-        date_query &= Q(update_time__gte=one_month_ago)
-        date_query &= Q(update_time__lte=datetime.now())
-        start_date = one_month_ago.strftime('%Y-%m-%d')
-        end_date = datetime.now().strftime('%Y-%m-%d')
-
-    data = Board.objects.filter(search_query & date_query)
-    
-    paginator = Paginator(data, 10)
-    page = request.GET.get('page')
-    data = paginator.get_page(page)
-    
-    
-    for item in data:
-        item.masked_name = mask_name(item.auth_user.first_name)
-        soup = BeautifulSoup(item.body, 'html.parser')
-        text = soup.get_text()
-        item.body = text
-        if len(text) > 10:
-            item.body = text[:10]
-            item.body += "..."
-  
-
-    context = {
-        'data': data,
-        'searchSelect': search_select,
-        'searchText': search_text,
-        'startDate': start_date,
-        'endDate': end_date,
-        'is_paginated': data.has_other_pages(),
-    }
-
-    return render(request, 'management/board_list.html', context)
-
-def board_detail(request, id):
-    board = get_object_or_404(Board, id=id)
-    return render(request, 'management/board_detail.html', {'board': board})
-
-def board_edit(request, id):
-    board = get_object_or_404(Board, id=id)
-    return render(request, 'management/board_detail.html', {'board': board})
 
 def detail(request, id, flag):
     """
@@ -205,20 +95,6 @@ def detail(request, id, flag):
         'data': data
     }
     return render(request, 'management/detail.html', context)
-
-def update_auth(request, id, status):
-    """
-    UPDATE counselor_profile SET active_status = ?
-    """
-    user = CounselorProfile.objects.get(id=id)
-    user.active_status = status
-    user.save()
-    
-    flag = 'm'
-    if status == 1:
-        flag = 'a'
-
-    return redirect('management:list', flag)
 
 
 def edit(request, id, flag):
@@ -252,9 +128,28 @@ def edit(request, id, flag):
         user_profile.save()
         auth_user.save()
         return redirect("management:detail", id=id, flag=flag)
+    
+    
+def update_auth(request, id, status):
+    """
+    UPDATE counselor_profile SET active_status = ?
+    """
+    user = CounselorProfile.objects.get(id=id)
+    user.active_status = status
+    user.save()
+    
+    flag = 'm'
+    if status == 1:
+        flag = 'a'
+
+    return redirect('management:list', flag)
+
 
 @csrf_exempt
 def adminsignup(request):
+    """
+    관리자 생성
+    """
     if request.method == 'GET':
         return render(request, 'management/adminsignup.html')
     elif request.method == 'POST':
@@ -292,224 +187,185 @@ def adminsignup(request):
 
         return JsonResponse({'result': result, 'msg': msg})
 
+
 @csrf_exempt
 def admincheck_username(request):
+    """
+    ID 중복 확인
+    """
     username = request.POST.get('username')
     is_taken = User.objects.filter(username=username).exists()
     print(is_taken)
     return JsonResponse({'is_taken': is_taken})
 
+
 def admincheck_email(request):
+    """
+    이메일 중복 확인
+    """
     email = request.GET.get('email')
     is_taken = User.objects.filter(email=email).exists()
     return JsonResponse({'is_taken': is_taken})
 
+
 def admincheck_phone(request): 
+    """
+    핸드폰 번호 중복 확인
+    """
     phone_number = request.GET.get('phone_number')
     is_taken = CounselorProfile.objects.filter(phone_number=phone_number).exists()
     return JsonResponse({'is_taken': is_taken})
 
-def adminreset_password(request):
+
+def board_list(request):
+    """
+    공지사항 목록
+    """
+    search_select = request.GET.get("searchSelect", "")
+    search_text = request.GET.get("searchText", "")
+    start_date = request.GET.get("startDate", "")
+    end_date = request.GET.get("endDate", "")
+
+    search_query = Q()
+    if search_select:
+        valid_fields = {
+            '1': 'title__icontains',
+            '2': 'body__icontains',
+            '3': 'auth_user__first_name__icontains',
+        }
+
+        if search_select == '0':
+            for val in valid_fields.values():
+                search_query |= Q(**{val: search_text})
+        else:
+            search_field = valid_fields[search_select]
+            search_query = Q(**{search_field: search_text})
+
+    date_query = Q()
+    if not (start_date and end_date):
+        one_month_ago = datetime.now() - timedelta(days=30)
+        start_date = one_month_ago.strftime("%Y-%m-%d")
+        end_date = datetime.now().strftime("%Y-%m-%d")
+
+    date_query = Q(auth_user__date_joined__range=[start_date+" 09:00:00", datetime.strptime(end_date+" 09:00:00", "%Y-%m-%d %H:%M:%S") + timedelta(days=1)])
+
+    data = Board.objects.filter(search_query & date_query)
+    
+    paginator = Paginator(data, 10)
+    page = request.GET.get('page')
+    data = paginator.get_page(page)
+    
+    for item in data:
+        item.masked_name = mask_name(item.auth_user.first_name)
+        soup = BeautifulSoup(item.body, 'html.parser')
+        text = soup.get_text()
+        item.body = text
+        if len(text) > 10:
+            item.body = text[:10]
+            item.body += "..."
+  
+    context = {
+        'data': data,
+        'searchSelect': search_select,
+        'searchText': search_text,
+        'startDate': start_date,
+        'endDate': end_date,
+        'is_paginated': data.has_other_pages(),
+    }
+
+    return render(request, 'management/board_list.html', context)
+
+
+def board_create(request):
+    """
+    공지사항 생성
+    """
     if request.method == 'POST':
-        new_password = request.POST.get('new_password')
-        user_id = request.session.get('reset_user_id')
+        title = request.POST.get('title')
+        body = request.POST.get('body')
+        flag = request.POST.get('flag', 0)
 
-        try:
-            user = User.objects.get(id=user_id)
-            user.set_password(new_password)
-            user.save()
-            del request.session['reset_user_id']
-            return JsonResponse({'result': 'success', 'msg': '비밀번호가 성공적으로 변경되었습니다.'})
-        except User.DoesNotExist:
-            return JsonResponse({'result': 'error', 'msg': '사용자를 찾을 수 없습니다.'})
-    return render(request, 'accounts/reset_password.html')
+        # 파일 형식 검증
+        if 'file' in request.FILES:
+            file = request.FILES['file']
+            file_extension = file.name.split('.')[-1].lower()
+            if file_extension not in ['jpg', 'jpeg', 'png']:
+                return render(request, 'management/board_create.html', {'error': '파일 형식이 유효하지 않습니다. jpg, jpeg, png 형식만 업로드 가능합니다.'})
 
+        board = Board.objects.create(
+            auth_user=request.user,
+            title=title,
+            body=body,
+            flag=flag
+        )
 
+        if 'file' in request.FILES:
+            board.file = request.FILES['file']
+            board.save()
 
-
-
-
-
-
-
-
-
-
-
-
+        return redirect('management:board_list')  # 공지사항 목록 페이지로 리디렉션
+    return render(request, 'management/board_create.html')
 
 
-def manager_edit(request, id):
+def board_detail(request, id):
     """
-    개인정보 수정
+    공지사항 상세
     """
-    user = get_object_or_404(CounselorProfile, id=id)
-    data = {'user': user}
-    #get으로 들어올시 기존값 반환
-    if request.method == 'GET':
-        return render(request, 'management/edit.html', data)
-    #post로 들어올시 수정된값 반환
-    else:
-        print(user)
-        user.name = request.POST.get('name') #이름
-        # user.birthday = request.POST.get('birthday') #생년월일
-        # user.phone_number = request.POST.get('phone_number') #전화번호
-        user.username = request.POST.get('username') #id
-        # user.password = request.POST.get('password') #pw
-        user.email = request.POST.get('email') #이메일
-        # user.address = request.POST.get('address') #주소
-        # user.belong = request.POST.get('belong') # 소속
-        # user.role = request.POST.get('role') #역할
-        # user.active_status = request.POST.get('active_status') #활동상태
-        user.save()
-        return redirect("management:detail", id)
+    board = get_object_or_404(Board, id=id)
+    return render(request, 'management/board_detail.html', {'board': board})
 
 
-
-
-def approve_user(request, id):
+def board_edit(request, id):
     """
-    가입 요청 승인
+    공지사항 수정
     """
-    user = CounselorProfile.objects.get(id=id)
-    data = CounselorProfile.objects.filter(active_status=0)
-    user.active_status = 1
-    user.save()
-    return render(request, 'management/allow.html', {'data':data})
+    board = get_object_or_404(Board, id=id)
+    
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        body = request.POST.get('body')
+        flag = request.POST.get('flag')
+        file = request.FILES.get('file')
+        
+        if 'file' in request.FILES:
+            file = request.FILES['file']
+            file_extension = file.name.split('.')[-1].lower()
+            if file_extension not in ['jpg', 'jpeg', 'png']:
+                return render(request, 'management/board_detail.html', {'error': '파일 형식이 유효하지 않습니다. jpg, jpeg, png 형식만 업로드 가능합니다.'})
+            
+        board.title = title
+        board.body = body
+        board.flag = flag
+        
+        if file:
+            if board.file and default_storage.exists(board.file.name):
+                default_storage.delete(board.file.name)
+            if 'file' in request.FILES:
+                board.file = request.FILES['file']
+                board.save()
+        
+        board.save()
+        return redirect('management:board_detail', id=board.id)
+    return render(request, 'management/board_edit.html', {'board': board})
 
 
-# 가입승인페이지
-def allow(request):
-    search_select = request.GET.get("searchSelect", "")
-    search_text = request.GET.get("searchText", "")
-    query = Q()
-
-    if search_select:
-        valid_fields = {
-            'name': 'auth_user__first_name__icontains',
-            'id': 'auth_user__username__icontains',
-            'email': 'auth_user__email__icontains',
-        }
-
-        if search_select == 'all':
-            for val in valid_fields.values():
-                print(val)
-                query |= Q(**{val: search_text})
-        else:
-            search_field = valid_fields[search_select]
-            query = Q(**{search_field: search_text})
-
-    data = CounselorProfile.objects.select_related('auth_user').filter(query)
-
-    context = {
-        'data': data,
-        'searchSelect': search_select,
-        'searchText': search_text,
-    }
-
-    return render(request, 'management/allow.html', context)
+def board_delete(request, id):
+    """
+    공지사항 삭제
+    """
+    board = get_object_or_404(Board, id=id)
+    if board.file:
+        if board.file and default_storage.exists(board.file.name):
+            default_storage.delete(board.file.name)
+    board.delete()
+    return redirect('management:board_list')
 
 
-#활동중인 인원 구분 및 보류 위한 페이지
-def inactive(request):
-    search_select = request.GET.get("searchSelect", "")
-    search_text = request.GET.get("searchText", "")
-    query = Q()
-
-    if search_select:
-        valid_fields = {
-            'name': 'auth_user__first_name__icontains',
-            'id': 'auth_user__username__icontains',
-            'email': 'auth_user__email__icontains',
-        }
-
-        if search_select == 'all':
-            for val in valid_fields.values():
-                print(val)
-                query |= Q(**{val: search_text})
-        else:
-            search_field = valid_fields[search_select]
-            query = Q(**{search_field: search_text})
-
-    data = CounselorProfile.objects.select_related('auth_user').filter(query)
-
-    context = {
-        'data': data,
-        'searchSelect': search_select,
-        'searchText': search_text,
-    }
-
-    return render(request, 'management/inactive.html', context)
-
-
-#비활성화 기능
-def disable(request, id):
-    user = get_object_or_404(CounselorProfile, id=id)
-    data = CounselorProfile.objects.all()
-    user.active_status = 0 
-    user.save() 
-    return render(request, 'management/detail.html', {'data':data}) 
-
-#활성화 기능
-def active(request, id):
-    user = get_object_or_404(CounselorProfile, id=id)
-    data = CounselorProfile.objects.all()
-    user.active_status = 1  
-    user.save() 
-    return render(request, 'management/detail.html', {'data':data}) 
-
-
-#휴직자 활성화기능
-def leave_active(request, id):
-    user = get_object_or_404(CounselorProfile, id=id)
-    data = CounselorProfile.objects.all()
-    user.active_status = 2  
-    user.save() 
-    return render(request, 'management/detail.html', {'data':data}) 
-
-#퇴사자 활성화기능
-def retire_active(request, id):
-    user = get_object_or_404(CounselorProfile, id=id)
-    data = CounselorProfile.objects.all()
-    user.active_status = 3  
-    user.save() 
-    return render(request, 'management/detail.html', {'data':data})
-
-# 보류자 활성화기능
-def reject_active(request, id):
-    user = get_object_or_404(CounselorProfile, id=id)
-    data = CounselorProfile.objects.all()
-    user.active_status = 4 
-    user.save()
-    return render(request, 'management/detail.html', {'data':data})
-
-#테스트페이지
-def test(request):
-    data = CounselorProfile.objects.all()
-    return render(request, 'management/test.html',{'data':data})
-
-#검색로직
-def search(request):
-    query = request.POST.get('seachText', '')
-   
-    if query:
-        results = CounselorProfile.objects.filter(name__icontains=query)
+def mask_name(full_name):
+    """
+    마스킹 처리
+    """
+    if len(full_name) <= 2:
+        return full_name[:-1] + '*'
     else:
-        results = []
-    return render(request, 'management/dashboard.html', {'data': results, 'query': query})
-       
-def allow_search(request):
-    query = request.POST.get('seachText', '')
-    if query:
-        results = CounselorProfile.objects.filter(name__icontains=query)
-    else:
-        results = []
-    return render(request, 'management/manager_dashboard.html', {'': results, 'query': query})
-         
-def inactive_search(request):
-    query = request.POST.get('seachText', '')
-    if query:
-        results = CounselorProfile.objects.filter(name__icontains=query)
-    else:
-        results = []
-    return render(request, 'management/manager_dashboard.html', {'data': results, 'query': query})
+        return full_name[0] + '*' * (len(full_name) - 2) + full_name[-1]

@@ -122,7 +122,7 @@ img.ezcs-logo {
     font-weight: bold;
 }
 
-.has-submenu>a::after {
+.has-submenu > a::after {
     content: none;
 }
 
@@ -371,7 +371,6 @@ img.ezcs-logo {
 .form-row span {
     flex: 1;
 }
-
 
 @media (max-width: 600px) {
     .form-row {

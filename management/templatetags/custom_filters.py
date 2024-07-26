@@ -12,3 +12,12 @@ def index(value, index):
         return value[index]
     except (IndexError, TypeError):
         return None
+    
+@register.filter(name='basename')
+def basename(value):
+    import os
+    return os.path.basename(value)
+
+@register.filter
+def contains(value, arg):
+    return arg in value

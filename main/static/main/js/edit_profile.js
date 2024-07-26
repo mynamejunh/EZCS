@@ -116,7 +116,7 @@ function emailDomainChange(obj) {
 $(document).ready(function () {
     $("#birth_date").val(new Date($("#birth_date").val()).toISOString().slice(0, 10));
 
-    $("#editProfileForm").on("submit", function(event) {
+    $("#editProfileForm").on("submit", function (event) {
         event.preventDefault();
         submitProfile();
     });

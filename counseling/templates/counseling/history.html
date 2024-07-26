@@ -105,7 +105,7 @@
                     {% endfor %}
                     {% else %}
                     <tr>
-                        <td class="noneDataRow" colspan="5">AI 상담 이력이 없습니다.</td>
+                        <td class="noneDataRow" colspan="{% if request.user.is_superuser %}6{% else %}5{% endif %}">AI 상담 이력이 없습니다.</td>
                     </tr>
                     {% endif %}
                 </tbody>

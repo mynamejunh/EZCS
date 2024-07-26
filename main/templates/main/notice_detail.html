@@ -1,26 +1,18 @@
-{% extends 'base.html' %}
-
-{% block title %}공지사항 상세{% endblock %}
+{% comment %} #공지사항 상세# {% endcomment %}
 
 {% block content %}
-<h2>{{ notice.title }}</h2>
-<p>{{ notice.create_time|date:"Y.m.d H:i" }}</p>
-<div>
-    {{ notice.body|safe }}
-</div>
-{% if notice.file %}
-    {% if is_image %}
-        <div>
+<div class="notice-detail-container">
+    <p class="notice-date">{{ notice.create_time|date:"Y.m.d" }}</p>
+    <h2 class="notice-title">{{ notice.title }}</h2>
+    {% if notice.file %}
+        {% if is_image %}
+        <div class="notice-image">
             <img src="{{ notice.file.url }}" alt="공지사항 이미지">
         </div>
+        {% endif %}
     {% endif %}
-
-<div>
-    <a href="{{ notice.file.url }}" download>첨부 파일 다운로드</a>
+    <div class="notice-body">
+        {{ notice.body|safe }}
+    </div>
 </div>
-{% endif %}
-<div class="mt-3">
-    <a href="{% url 'main:user_dashboard' %}" class="btn btn-primary">목록으로 돌아가기</a>
-</div>
-
 {% endblock %}

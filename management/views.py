@@ -195,7 +195,6 @@ def admincheck_username(request):
     """
     username = request.POST.get('username')
     is_taken = User.objects.filter(username=username).exists()
-    print(is_taken)
     return JsonResponse({'is_taken': is_taken})
 
 
